@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from api.views import index_view
 
-admin.site.site_header = "Painel de Controle"
+admin.site.site_header = "Painel de Administração"
 admin.site.site_title = "Administração do Site"
 admin.site.index_title = "Bem-vindo ao Portal de Administração"
 
