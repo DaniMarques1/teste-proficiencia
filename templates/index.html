@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Quiz</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script src="{% static 'js/loadQuestion.js' %}"></script>
+    <script src="{% static 'js/audio.js' %}"></script>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="navbar-logo">
+            <a href="/">
+                <img src="{% static 'img/logo.svg' %}" alt="Portuguese Best Way Logo">
+            </a>
+        </div>
+        <div class="navbar-title">
+            Learning Quiz
+        </div>
+        <button class="navbar-toggle">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </button>
+    </nav>
+
+<main class="main-content">
+    <div class="quiz-container">
+        <h2 id="question-title" class="question-title">Carregando...</h2>
+
+        <div class="cards-container" id="cards-container">
+            <div class="cards-front">
+                <div class="card">
+                    <div class="card-header">Portuguese</div>
+                    <div class="card-content">
+                        <span id="question-text" class="text">...</span>
+                        <button class="icon-button" id="speak-button"><i class="fas fa-volume-up"></i></button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">English</div>
+                    <div class="card-content">
+                        <input type="text" id="translation-input" placeholder="Sua Tradução">
+                        <button class="icon-button microphone" id="mic-button"><i class="fas fa-microphone"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-back">
+                <div class="card answer-card" id="answer-card"></div>
+            </div>
+        </div>
+
+        <div class="buttons-container">
+            <button class="next-button" id="next-button">Verify</button>
+            <button class="restart-button" id="restart-button" style="display: none;">Retake the Quiz</button>
+        </div>
+    </div>
+</main>
+</body>
+</html>

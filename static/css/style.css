@@ -1,0 +1,333 @@
+/* Importa a fonte Open Sans do Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@700&display=swap');
+
+/* Reseta estilos básicos para garantir consistência */
+body {
+    margin: 0;
+    font-family: 'Open Sans', sans-serif;
+    min-height: 100vh; 
+    display: flex;
+    flex-direction: column; 
+}
+
+/* Estilo da barra de navegação (navbar) */
+.navbar {
+    background-color: #e0f2f7; 
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    border-bottom: 1px solid #cce8ee;
+}
+
+/* Estilo do logo */
+.navbar-logo img {
+    height: 40px; 
+    vertical-align: middle; 
+}
+
+/* Estilo do título central */
+.navbar-title {
+    color: #0d47a1; 
+    font-size: 1.5em; 
+    font-weight: bold;
+}
+
+/* Estilo para o botão do menu hamburguer */
+.navbar-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px; 
+}
+
+/* Estilo para cada linha do hamburguer */
+.navbar-toggle .bar {
+    display: block;
+    width: 30px;
+    height: 4px;
+    background-color: #0d47a1; 
+    border-radius: 2px;
+}
+
+/* ------------------------------------- */
+/* Estilos para a seção principal (main) */
+/* ------------------------------------- */
+
+.main-content {
+    flex-grow: 1; 
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    padding: 20px; 
+    box-sizing: border-box; 
+    background-image: url('../images/background.png'); 
+    background-size: cover; 
+    background-position: center; 
+    position: relative; 
+}
+
+/* Overlay para a imagem de fundo ficar transparente */
+.main-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.8); 
+    z-index: 1; 
+}
+
+/* Conteúdo do quiz dentro do main-content */
+.quiz-container {
+    background-color: rgba(96, 211, 237, 0.3); 
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    max-width: 600px;
+    width: 100%;
+    z-index: 2; 
+}
+
+.question-title {
+    color: #0d47a1;
+    font-size: 1.8em;
+    margin-bottom: 25px;
+}
+
+.card {
+    background-color: #42a5f5; 
+    border-radius: 10px;
+    padding: 20px;
+    flex: 1; 
+    min-width: 200px; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.card-header {
+    font-size: 0.9em;
+    margin-bottom: 10px;
+    opacity: 0.8; 
+}
+
+.card-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px; 
+    width: 100%; 
+}
+
+.card-content .text {
+    font-size: 2.5em; 
+    font-weight: bold;
+}
+
+.card-content input[type="text"] {
+    flex-grow: 1; 
+    padding: 5px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+    color: #333;
+    background-color: rgba(255, 255, 255, 0.8); 
+}
+
+.icon-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: white;
+    font-size: 1.5em; 
+    padding: 5px;
+    border-radius: 5px;
+    transition: background-color 0.2s;
+}
+
+.icon-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.icon-button.microphone {
+    color: #0d47a1; 
+    background-color: white; 
+    font-size: 1.8em; 
+    padding: 8px;
+}
+
+.icon-button.microphone:hover {
+    background-color: #f0f0f0;
+}
+
+/* Container dos botões */
+.buttons-container {
+    display: flex;
+    justify-content: center; 
+    gap: 15px; 
+    margin-top: 20px;
+}
+
+.restart-button {
+    background-color: #0d47a1;
+    color: white;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.restart-button:hover {
+    background-color: #09357a;
+}
+
+.next-button {
+    background-color: rgb(25, 210, 124); 
+    color: white;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 3; 
+}
+
+.next-button:hover {
+    background-color: rgb(21, 173, 102); 
+}
+
+
+/* --------------------------------------------- */
+/* --- ESTILOS DA ANIMAÇÃO E RESPOSTA --- */
+/* --------------------------------------------- */
+
+.cards-container {
+    margin-bottom: 30px;
+    perspective: 1000px;
+    position: relative;
+    min-height: 150px; 
+}
+
+.cards-front, .card-back {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
+}
+
+.cards-front {
+    display: flex;
+    justify-content: space-around;
+    gap: 20px;
+    flex-wrap: wrap; 
+    transform: rotateY(0deg); 
+}
+
+/* Container do verso */
+.card-back {
+    display: flex;
+    justify-content: center;
+    align-items: stretch; 
+    transform: rotateY(-180deg); 
+}
+
+.cards-container.flipped .cards-front {
+    transform: rotateY(180deg);
+}
+
+.cards-container.flipped .card-back {
+    transform: rotateY(0deg);
+}
+
+/* Estilo para o card de resposta único */
+.answer-card {
+    width: 100%; 
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+/* Estilo para o card de resposta CORRETA */
+.answer-card.correct {
+    background-color: #d4edda;
+    color: #155724;
+    border: 2px solid #c3e6cb;
+}
+
+/* Estilo para o card de resposta INCORRETA */
+.answer-card.incorrect {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 2px solid #f5c6cb;
+}
+
+
+/* --------------------------------------------- */
+/* --- ESTILOS DE ANIMAÇÃO DO MICROFONE --- */
+/* --------------------------------------------- */
+
+.microphone.is-listening {
+    color: red;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
+    }
+    70% {
+        transform: scale(1.1);
+        box-shadow: 0 0 10px 20px rgba(255, 0, 0, 0);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+    }
+}
+
+/* --------------------------------------------- */
+/* --- MEDIA QUERIES PARA RESPONSIVIDADE --- */
+/* --------------------------------------------- */
+
+@media (max-width: 768px) {
+    .navbar-title {
+        font-size: 1.2em;
+    }
+    
+    .quiz-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    .cards-container{
+        min-height: 300px; 
+    }
+    .card {
+        width: 90%; 
+    }
+
+    .next-button {
+        align-self: center; 
+    }
+}
