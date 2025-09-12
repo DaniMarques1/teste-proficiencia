@@ -46,5 +46,9 @@ py manage.py runserver
 - HTML/CSS
 - Javascript
 
+# Estrutura do projeto explicada
+
+![Estrutura da Página](static/img/estrutura_pagina.png)
+
 
 
