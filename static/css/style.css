@@ -64,7 +64,7 @@ body {
     align-items: center; 
     padding: 20px; 
     box-sizing: border-box; 
-    background-image: url('../images/background.png'); 
+    background-image: url('../img/background.png'); 
     background-size: cover; 
     background-position: center; 
     position: relative; 
@@ -89,8 +89,9 @@ body {
     padding: 30px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     text-align: center;
-    max-width: 600px;
+    max-width: 800px;
     width: 100%;
+    min-height: 50vh;
     z-index: 2; 
 }
 
@@ -100,12 +101,22 @@ body {
     margin-bottom: 25px;
 }
 
+/* NOVO: Container dos cards agora é flex-column com espaçamento */
+.cards-container {
+    margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px; 
+    transition: opacity 0.3s ease-in-out;
+}
+
+.cards-container.fade-out {
+    opacity: 0;
+}
 .card {
     background-color: #42a5f5; 
     border-radius: 10px;
     padding: 20px;
-    flex: 1; 
-    min-width: 200px; 
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -113,6 +124,8 @@ body {
     color: white;
     text-align: center;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    width: 100%; 
+    box-sizing: border-box; 
 }
 
 .card-header {
@@ -130,13 +143,13 @@ body {
 }
 
 .card-content .text {
-    font-size: 2.5em; 
+    font-size: 1.5em; 
     font-weight: bold;
 }
 
 .card-content input[type="text"] {
     flex-grow: 1; 
-    padding: 5px;
+    padding: 10px;
     border: none;
     border-radius: 5px;
     font-size: 1.1em;
@@ -170,6 +183,58 @@ body {
     background-color: #f0f0f0;
 }
 
+/* NOVO: Estilos para as opções de múltipla escolha */
+#answers-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.answer-option {
+    background-color: #ffffff;
+    color: #0d47a1;
+    border: 2px solid #b3e5fc;
+    border-radius: 8px;
+    padding: 15px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    text-align: left;
+}
+
+.answer-option:hover {
+    background-color: #e0f7fa;
+    border-color: #0d47a1;
+}
+
+.answer-option.selected {
+    background-color: #0d47a1;
+    color: white;
+    border-color: #0d47a1;
+}
+
+/* Estilo para o card de resposta */
+.answer-card {
+    width: 100%; 
+    font-size: 1.5em;
+    font-weight: bold;
+    box-sizing: border-box;
+}
+
+.answer-card.correct {
+    background-color: #d4edda;
+    color: #155724;
+    border: 2px solid #c3e6cb;
+}
+
+.answer-card.incorrect {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 2px solid #f5c6cb;
+}
+
+
 /* Container dos botões */
 .buttons-container {
     display: flex;
@@ -178,25 +243,8 @@ body {
     margin-top: 20px;
 }
 
-.restart-button {
-    background-color: #0d47a1;
-    color: white;
-    padding: 12px 30px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.2em;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    font-weight: bold;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-.restart-button:hover {
-    background-color: #09357a;
-}
-
 .next-button {
-    background-color: rgb(25, 210, 124); 
+    background-color: #1976d2; 
     color: white;
     padding: 12px 30px;
     border: none;
@@ -211,85 +259,143 @@ body {
 }
 
 .next-button:hover {
-    background-color: rgb(21, 173, 102); 
+    background-color: #1976d2; 
 }
 
-
-/* --------------------------------------------- */
-/* --- ESTILOS DA ANIMAÇÃO E RESPOSTA --- */
-/* --------------------------------------------- */
-
-.cards-container {
-    margin-bottom: 30px;
-    perspective: 1000px;
-    position: relative;
-    min-height: 150px; 
-}
-
-.cards-front, .card-back {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
-}
-
-.cards-front {
-    display: flex;
-    justify-content: space-around;
-    gap: 20px;
-    flex-wrap: wrap; 
-    transform: rotateY(0deg); 
-}
-
-/* Container do verso */
-.card-back {
-    display: flex;
-    justify-content: center;
-    align-items: stretch; 
-    transform: rotateY(-180deg); 
-}
-
-.cards-container.flipped .cards-front {
-    transform: rotateY(180deg);
-}
-
-.cards-container.flipped .card-back {
-    transform: rotateY(0deg);
-}
-
-/* Estilo para o card de resposta único */
-.answer-card {
-    width: 100%; 
-    font-size: 1.5em;
-    font-weight: bold;
-}
-
-/* Estilo para o card de resposta CORRETA */
-.answer-card.correct {
-    background-color: #d4edda;
-    color: #155724;
-    border: 2px solid #c3e6cb;
-}
-
-/* Estilo para o card de resposta INCORRETA */
-.answer-card.incorrect {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 2px solid #f5c6cb;
-}
-
-
-/* --------------------------------------------- */
-/* --- ESTILOS DE ANIMAÇÃO DO MICROFONE --- */
-/* --------------------------------------------- */
-
+/* Animação do microfone */
 .microphone.is-listening {
     color: red;
     animation: pulse 1.5s infinite;
+}
+
+/* Estilos para a tela de resultados do Quiz */
+.quiz-summary {
+    text-align: center;
+    font-size: 1.3em;
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #f7f9fc;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.score-container {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 20px;
+    font-size: 1.1em;
+}
+
+.score-correct {
+    color: #155724;
+    font-weight: bold;
+}
+
+.score-incorrect {
+    color: #721c24;
+    font-weight: bold;
+}
+
+.detailed-results h3 {
+    color: #0d47a1;
+    border-bottom: 2px solid #bbdefb;
+    padding-bottom: 10px;
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+
+.results-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.results-list li {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.results-list li p {
+    margin: 5px 0;
+}
+
+.user-answer {
+    color: #d9534f; 
+    font-weight: bold;
+    text-decoration: line-through;
+}
+
+.correct-answer {
+    color: #5cb85c; 
+    font-weight: bold;
+}
+
+/* --- ESTILOS PARA TELA DE COLETA DE DADOS --- */
+
+#user-data-container {
+    background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    z-index: 2;
+}
+
+#user-data-container h2 {
+    color: #0d47a1;
+    margin-top: 0;
+    margin-bottom: 30px;
+    font-size: 1.8em;
+}
+
+#user-data-form .form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+#user-data-form label {
+    color: #0d47a1;
+    font-weight: bold;
+    width: 80px; 
+    margin-right: 15px;
+    text-align: right;
+}
+
+#user-data-form input {
+    flex-grow: 1; 
+    padding: 12px;
+    border: 1px solid #b0bec5;
+    border-radius: 8px;
+    font-size: 1em;
+    font-family: 'Open Sans', sans-serif;
+}
+
+#user-data-form button {
+    background-color: #1976d2; 
+    color: white;
+    padding: 12px 40px;
+    border: none;
+    border-radius: 25px; 
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+#user-data-form button:hover {
+    background-color: #0d47a1;
+    transform: translateY(-2px);
 }
 
 @keyframes pulse {
@@ -307,27 +413,9 @@ body {
     }
 }
 
-/* --------------------------------------------- */
-/* --- MEDIA QUERIES PARA RESPONSIVIDADE --- */
-/* --------------------------------------------- */
-
+/* Media Queries */
 @media (max-width: 768px) {
     .navbar-title {
         font-size: 1.2em;
-    }
-    
-    .quiz-container {
-        flex-direction: column;
-        align-items: center;
-    }
-    .cards-container{
-        min-height: 300px; 
-    }
-    .card {
-        width: 90%; 
-    }
-
-    .next-button {
-        align-self: center; 
     }
 }

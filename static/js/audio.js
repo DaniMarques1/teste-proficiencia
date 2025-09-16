@@ -1,79 +1,70 @@
-// Aguarda o conteúdo da página ser totalmente carregado
-document.addEventListener('DOMContentLoaded', function() {
+let recognition;
 
-    // --- LÓGICA PARA O BOTÃO DE ÁUDIO (TEXT-TO-SPEECH) ---
-    const speakButton = document.getElementById('speak-button');
+// Configura o reconhecimento de voz uma única vez.
+function setupRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.lang = 'pt-BR'; // <<-- Idioma da resposta
+        recognition.interimResults = true;
+        recognition.continuous = false;
+    }
+}
+
+/**
+ * Anexa os listeners de evento para os botões de áudio (falar e microfone).
+ * Esta função deve ser chamada toda vez que uma nova questão é renderizada.
+ */
+export function initializeAudioFeatures() {
+    // 1. Text-to-Speech (Falar)
+    // Seleciona TODOS os botões com a classe 'speak-button'
+    const speakButtons = document.querySelectorAll('.speak-button');
     
-    if (speakButton) {
-        speakButton.addEventListener('click', function() {
-            const questionTextElement = document.getElementById('question-text');
-            
-            if (!questionTextElement || !questionTextElement.textContent) {
-                alert('There is no text to read');
-                return;
-            }
-            
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(questionTextElement.textContent);
-                utterance.lang = 'pt-BR';
+    // Itera sobre cada botão encontrado
+    speakButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Encontra o elemento de texto mais próximo DENTRO do mesmo '.card-content'
+            const textElement = button.closest('.card-content').querySelector('.text-to-speak');
+            const textToSpeak = textElement ? textElement.textContent : '';
+
+            if ('speechSynthesis' in window && textToSpeak) {
+                const utterance = new SpeechSynthesisUtterance(textToSpeak);
+                utterance.lang = 'pt-BR'; // Idioma da pergunta
                 window.speechSynthesis.speak(utterance);
             } else {
-                alert('Sorry, your browser does not support text reading funcionalities.');
+                alert('Seu navegador não suporta a funcionalidade de leitura de texto.');
             }
         });
-    }
+    });
 
-    // --- LÓGICA PARA O BOTÃO DE MICROFONE (SPEECH-TO-TEXT) ---
+    // 2. Speech-to-Text (Microfone) - Esta parte permanece igual, pois o ID do microfone é único.
     const micButton = document.getElementById('mic-button');
     const translationInput = document.getElementById('translation-input');
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-    if (!micButton || !translationInput) {
-        console.error("Microphone elements not found.");
-        return;
-    }
-
-    if (SpeechRecognition) {
-        const recognition = new SpeechRecognition();
-
-        // Configurações do reconhecimento de voz
-        recognition.lang = 'pt-BR';
-        recognition.interimResults = true; // Mostra resultados parciais
-        recognition.continuous = false;    // Para de gravar após uma pausa
-
-        // Evento de clique no botão do microfone para iniciar o reconhecimento
+    
+    if (micButton && translationInput && recognition) {
         micButton.addEventListener('click', () => {
             micButton.classList.add('is-listening');
-            translationInput.value = ''; // Limpa o campo de texto
+            translationInput.value = '';
             recognition.start();
         });
 
-        // Processa o resultado da fala em tempo real
-        recognition.addEventListener('result', (event) => {
+        recognition.onresult = (event) => {
             const transcript = Array.from(event.results)
-                .map(result => result[0])
-                .map(result => result.transcript)
+                .map(result => result[0].transcript)
                 .join('');
-            
-            // Remove a pontuação final (., ? !) para não interferir em validações
             translationInput.value = transcript.replace(/[\.,\?!]$/, '');
-        });
+        };
 
-        // Remove o feedback visual quando a escuta terminar
-        recognition.addEventListener('end', () => {
+        recognition.onend = () => micButton.classList.remove('is-listening');
+        recognition.onerror = (event) => {
+            alert('Erro no reconhecimento de voz: ' + event.error);
             micButton.classList.remove('is-listening');
-        });
-        
-        // Trata possíveis erros durante o reconhecimento
-        recognition.addEventListener('error', (event) => {
-            alert('Voice recognition error: ' + event.error);
-            micButton.classList.remove('is-listening');
-        });
-
-    } else {
-        // Desabilita o botão se o navegador não for compatível
+        };
+    } else if (micButton) {
         micButton.disabled = true;
-        micButton.title = 'Your browser does not support voice recognition.';
-        alert('Sorry, your browser does not support voice recognition.');
+        micButton.title = 'Reconhecimento de voz não é suportado.';
     }
-});
+}
+
+// Inicializa a API de reconhecimento de voz assim que o módulo é carregado.
+setupRecognition();

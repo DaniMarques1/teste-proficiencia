@@ -6,22 +6,33 @@ QUESTIONS_DB = [
         "id": 1,
         "header": "The Basics",
         "level": 0,
-        "question": "Olá",
+        "texto": "Traduza a seguinte palavraSS:",
+        "questao": "Olá",
+        "tipo": "texto",
         "answer": ["Hello", "Hi"],
     },
     {
         "id": 2,
         "header": "The Basics",
         "level": 0,
-        "question": "Tchau",
+        "texto": "Traduza a seguinte palavra:",
+        "questao": "Tchau",
+        "tipo": "texto",
         "answer": ["Bye", "Good bye"],
     },
     {
-        "id": 3,
-        "header": "Politeness",
-        "level": 1,
-        "question": "Obrigado",
-        "answer": ["Thank you", "Thanks"],
+    "id": 3,
+    "header": "Politeness",
+    "level": 1,
+    "texto": "Escolha a resposta correta:",
+    "questao": "What is the meaning of the word Obrigado",
+    "tipo": "multipla-escolha",
+    "respostas": [
+        { "id": 1, "texto": "You're welcome", "correta": False },
+        { "id": 2, "texto": "Thank you", "correta": True },
+        { "id": 3, "texto": "Please", "correta": False },
+        { "id": 4, "texto": "Sorry", "correta": False }
+    ]
     }
 ]
 

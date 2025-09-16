@@ -8,8 +8,7 @@
     <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <script src="{% static 'js/loadQuestion.js' %}"></script>
-    <script src="{% static 'js/audio.js' %}"></script>
+    <script type="module" src="{% static 'js/main.js' %}"></script>
 </head>
 <body>
 
@@ -29,39 +28,30 @@
         </button>
     </nav>
 
-<main class="main-content">
-    <div class="quiz-container">
-        <h2 id="question-title" class="question-title">Carregando...</h2>
-
-        <div class="cards-container" id="cards-container">
-            <div class="cards-front">
-                <div class="card">
-                    <div class="card-header">Portuguese</div>
-                    <div class="card-content">
-                        <span id="question-text" class="text">...</span>
-                        <button class="icon-button" id="speak-button"><i class="fas fa-volume-up"></i></button>
-                    </div>
+    <main class="main-content">
+        <div id="user-data-container">
+            <h2>Queremos te conhecer...</h2>
+            <form id="user-data-form">
+                <div class="form-row">
+                    <label for="user-email">E-mail:</label>
+                    <input type="email" id="user-email" name="email" placeholder="email@exemplo.com.br">
                 </div>
-
-                <div class="card">
-                    <div class="card-header">English</div>
-                    <div class="card-content">
-                        <input type="text" id="translation-input" placeholder="Sua Tradução">
-                        <button class="icon-button microphone" id="mic-button"><i class="fas fa-microphone"></i></button>
-                    </div>
+                <div class="form-row">
+                    <label for="user-name">Nome:</label>
+                    <input type="text" id="user-name" name="name" placeholder="Seu nome">
                 </div>
-            </div>
-
-            <div class="card-back">
-                <div class="card answer-card" id="answer-card"></div>
-            </div>
+                <button type="submit">Submit</button>
+            </form>
         </div>
 
-        <div class="buttons-container">
-            <button class="next-button" id="next-button">Verify</button>
-            <button class="restart-button" id="restart-button" style="display: none;">Retake the Quiz</button>
+        <div class="quiz-container" style="display: none;">
+            <h2 id="question-title" class="question-title">Carregando...</h2>
+            <div class="cards-container" id="cards-container">
+                </div>
+            <div class="buttons-container">
+                <button class="next-button" id="next-button">Verificar</button>
+            </div>
         </div>
-    </div>
-</main>
+    </main>
 </body>
 </html>
