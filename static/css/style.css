@@ -86,7 +86,7 @@ body {
 .quiz-container {
     background-color: rgba(96, 211, 237, 0.3); 
     border-radius: 15px;
-    padding: 30px;
+    padding: 20px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     text-align: center;
     max-width: 800px;
@@ -101,7 +101,6 @@ body {
     margin-bottom: 25px;
 }
 
-/* NOVO: Container dos cards agora é flex-column com espaçamento */
 .cards-container {
     margin-bottom: 30px;
     display: flex;
@@ -183,7 +182,6 @@ body {
     background-color: #f0f0f0;
 }
 
-/* NOVO: Estilos para as opções de múltipla escolha */
 #answers-container {
     display: flex;
     flex-direction: column;
@@ -214,6 +212,14 @@ body {
     border-color: #0d47a1;
 }
 
+.answer-options-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+  gap: 10px; 
+  margin-top: 20px; 
+  width: 100%;
+}
 /* Estilo para o card de resposta */
 .answer-card {
     width: 100%; 
@@ -269,69 +275,88 @@ body {
 }
 
 /* Estilos para a tela de resultados do Quiz */
+
 .quiz-summary {
+    background: linear-gradient(160deg, #4facfe 0%, #00f2fe 100%);
+    color: white; 
+    padding: 35px; 
+    border-radius: 20px; 
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); 
     text-align: center;
-    font-size: 1.3em;
+    border: none; 
     margin-bottom: 30px;
-    padding: 20px;
-    background-color: #f7f9fc;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
 }
 
+/* Container para a pontuação. */
 .score-container {
     display: flex;
     justify-content: center;
-    gap: 40px;
-    margin-top: 20px;
-    font-size: 1.1em;
-}
+    gap: 30px;
 
-.score-correct {
-    color: #155724;
+    font-size: 1.5em; 
     font-weight: bold;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2); /
 }
 
+.score-correct,
 .score-incorrect {
-    color: #721c24;
     font-weight: bold;
+    color: inherit; 
 }
 
 .detailed-results h3 {
-    color: #0d47a1;
-    border-bottom: 2px solid #bbdefb;
-    padding-bottom: 10px;
-    margin-top: 30px;
-    margin-bottom: 20px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3); 
+    margin-top: 20px;
+    margin-bottom: 25px;
+    font-size: 1.4em;
+    text-align: left; 
 }
 
+/* Lista de resultados (ul) */
 .results-list {
     list-style-type: none;
     padding: 0;
 }
 
 .results-list li {
-    background-color: #ffffff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 15px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    background-color: #ffffff; 
+    color: #333; 
+    border: none; 
+    border-radius: 15px; 
+    padding: 20px; 
+    margin-bottom: 20px; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
+    text-align: left; 
+    transition: transform 0.2s ease-in-out;
 }
 
+/* Efeito de elevação ao passar o mouse sobre o card da questão */
+.results-list li:hover {
+    transform: translateY(-4px);
+}
+
+/* Parágrafos dentro do card da questão */
 .results-list li p {
-    margin: 5px 0;
+    margin: 8px 0;
+    font-size: 1.1em;
+    line-height: 1.5;
 }
 
 .user-answer {
-    color: #d9534f; 
+    color: #e53935; 
     font-weight: bold;
-    text-decoration: line-through;
+    text-decoration: none; 
+    background-color: #ffebee; 
+    padding: 2px 8px;
+    border-radius: 5px;
 }
 
 .correct-answer {
-    color: #5cb85c; 
+    color: #43a047; 
     font-weight: bold;
+    background-color: #e8f5e9; 
+    padding: 2px 8px;
+    border-radius: 5px;
 }
 
 /* --- ESTILOS PARA TELA DE COLETA DE DADOS --- */
@@ -398,6 +423,146 @@ body {
     transform: translateY(-2px);
 }
 
+/* --- Estrutura Principal do Feedback --- */
+#feedback-container {
+    z-index: 2;
+}
+
+.feedback-grid-container {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr; 
+    gap: 30px; 
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* --- Coluna da Esquerda (Resumo) --- */
+.feedback-summary-panel {
+    background: linear-gradient(160deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    overflow-y: auto;
+}
+
+.feedback-summary-panel h2, .feedback-summary-panel h3 {
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.feedback-summary-panel h3 {
+    font-weight: 300;
+    margin-bottom: 30px;
+}
+
+.feedback-section {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.feedback-section h4 {
+    margin: 0 0 10px 0;
+    font-size: 1.2em;
+    color: white;
+}
+
+.feedback-section h4 i {
+    margin-right: 10px;
+}
+
+/* --- Coluna da Direita (Professores) --- */
+.feedback-teachers-panel {
+    border-radius: 20px;
+    overflow: hidden; 
+}
+
+.congratulations-section {
+    background-color: #27ae60; 
+    color: white;
+    padding: 30px;
+    text-align: center;
+}
+
+.teacher-card {
+    display: flex;
+    align-items: center;
+    background-color: #2c3e50; 
+    color: white;
+    border-radius: 15px;
+    padding: 15px;
+    margin: 20px 0;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    text-align: left;
+}
+
+.teacher-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 20px;
+    border: 3px solid #4facfe;
+}
+
+.teacher-info h4 {
+    margin: 0 0 5px 0;
+    font-size: 1.2em;
+}
+
+.teacher-langs {
+    display: inline-block;
+    background-color: rgba(255, 255, 255, 0.2);
+    font-size: 0.8em;
+    padding: 4px 10px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+}
+
+.teacher-info p {
+    font-size: 0.9em;
+    margin: 0 0 15px 0;
+    line-height: 1.5;
+    opacity: 0.9;
+}
+
+/* --- Botões --- */
+.feedback-button {
+    background-color: #9bf089;
+    color: #333;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 10px;
+    border: 2px solid transparent;
+}
+
+.feedback-button:hover {
+    background-color: #82d870;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.email-button { 
+    background-color: #fff;
+    color: #007bff;
+    border: 2px solid #007bff;
+}
+
+.email-button:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+
 @keyframes pulse {
     0% {
         transform: scale(1);
@@ -417,5 +582,11 @@ body {
 @media (max-width: 768px) {
     .navbar-title {
         font-size: 1.2em;
+    }
+}
+
+@media (max-width: 900px) {
+    .feedback-grid-container {
+        grid-template-columns: 1fr;
     }
 }

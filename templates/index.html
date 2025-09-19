@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Learning Quiz</title>
+    <title>Proficiency Test</title>
     <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
@@ -19,7 +19,7 @@
             </a>
         </div>
         <div class="navbar-title">
-            Learning Quiz
+            Proficiency Test
         </div>
         <button class="navbar-toggle">
             <span class="bar"></span>
@@ -30,27 +30,30 @@
 
     <main class="main-content">
         <div id="user-data-container">
-            <h2>Queremos te conhecer...</h2>
+            <h2>We want to know you...</h2>
             <form id="user-data-form">
                 <div class="form-row">
                     <label for="user-email">E-mail:</label>
-                    <input type="email" id="user-email" name="email" placeholder="email@exemplo.com.br">
+                    <input type="email" id="user-email" name="email" placeholder="email@exemple.com">
                 </div>
                 <div class="form-row">
-                    <label for="user-name">Nome:</label>
-                    <input type="text" id="user-name" name="name" placeholder="Seu nome">
+                    <label for="user-name">Name:</label>
+                    <input type="text" id="user-name" name="name" placeholder="Your name">
                 </div>
                 <button type="submit">Submit</button>
             </form>
         </div>
 
         <div class="quiz-container" style="display: none;">
-            <h2 id="question-title" class="question-title">Carregando...</h2>
+            <h2 id="question-title" class="question-title">Loading...</h2>
             <div class="cards-container" id="cards-container">
                 </div>
             <div class="buttons-container">
-                <button class="next-button" id="next-button">Verificar</button>
+                <button class="next-button" id="next-button">Next</button>
             </div>
+        </div>
+
+        <div id="feedback-container" style="display: none;">
         </div>
     </main>
 </body>

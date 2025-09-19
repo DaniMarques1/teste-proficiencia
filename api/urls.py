@@ -5,4 +5,5 @@ from api.views import index_view
 
 urlpatterns = [
     path('question/<int:question_id>/', views.get_question, name='get_question'),
+    path('teachers/', views.get_teachers, name='get_teachers'),
 ]
