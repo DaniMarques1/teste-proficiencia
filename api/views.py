@@ -15,7 +15,18 @@ def get_question(request, question_id):
         
     return JsonResponse(question)
 
-# 2. Crie a nova view para os professores
+
+def get_teacher(request, teacher_id):
+    teacher = next((q for q in PROFESSORES_DB if q['id'] == teacher_id), None)
+
+    if request.headers.get('sec-fetch-site') != 'same-origin':
+        return HttpResponseForbidden("Forbidden")
+    
+    if teacher is None:
+        return JsonResponse({'error': f'Question with id {teacher_id} not found.'}, status=404)
+        
+    return JsonResponse(teacher)
+
 def get_teachers(request):
     """
     Retorna a lista completa de professores como JSON.

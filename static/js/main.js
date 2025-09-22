@@ -1,4 +1,4 @@
-import { fetchQuestion, fetchTeachers } from './api.js'; 
+import { fetchQuestion, fetchTeachers } from './api.js';
 import { renderQuestionUI, displayFeedbackScreen, displayQuizFinished, applyFade } from './ui.js';
 import { initializeAudioFeatures } from './audio.js';
 
@@ -11,11 +11,14 @@ let resultados = [];
 const userDataContainer = document.getElementById('user-data-container');
 const userDataForm = document.getElementById('user-data-form');
 const quizContainer = document.querySelector('.quiz-container');
-// 2. Adicione o novo container de feedback
 const feedbackContainer = document.getElementById('feedback-container');
 const questionTitleElement = document.getElementById('question-title');
 const cardsContainer = document.getElementById('cards-container');
 const nextButton = document.getElementById('next-button');
+
+// --- ELEMENTOS DA TELA DE APRESENTAÇÃO ---
+const presentationContainer = document.getElementById('presentation-container');
+const startQuizButton = document.getElementById('start-quiz-button');
 
 // --- FUNÇÕES DE CONTROLE DO QUIZ ---
 async function loadQuestion() {
@@ -32,7 +35,6 @@ async function loadQuestion() {
             textInput.addEventListener('keyup', handleEnterKey);
         }
     } catch (error) {
-        // 3. Quando o quiz acabar (erro 404), chame a nova função handleQuizEnd
         if (error.status === 404) {
             handleQuizEnd();
         } else {
@@ -42,10 +44,6 @@ async function loadQuestion() {
     }
 }
 
-/**
- * 4. Nova função para gerenciar a transição para a tela de feedback.
- * Isso organiza melhor o código que estava no 'catch'.
- */
 async function handleQuizEnd() {
     applyFade(quizContainer, 'out');
     nextButton.style.display = 'none';
@@ -58,28 +56,24 @@ async function handleQuizEnd() {
             feedbackContainer.style.display = 'block';
             
             displayFeedbackScreen(resultados, teachers, questionTitleElement, feedbackContainer);
-            applyFade(feedbackContainer, 'in');
+            
+            requestAnimationFrame(() => applyFade(feedbackContainer, 'in'));
 
-            // --- LÓGICA DOS BOTÕES ATUALIZADA ---
             const emailButton = document.getElementById('get-results-button');
             const showDetailsButton = document.getElementById('show-details-button');
             
-            // Ação para o botão de Email (atualmente, só exibe um alerta)
             if (emailButton) {
                 emailButton.addEventListener('click', () => {
                     alert('Funcionalidade de envio de email a ser implementada!');
-                    // Aqui você chamaria a função para enviar os resultados para o backend
                 });
             }
             
-            // Ação para o botão de ver respostas detalhadas
             if (showDetailsButton) {
                 showDetailsButton.addEventListener('click', () => {
                     applyFade(feedbackContainer, 'out');
                     setTimeout(() => {
-                        // Mostra a lista de respostas corretas e incorretas
                         displayQuizFinished(resultados, questionTitleElement, feedbackContainer);
-                        applyFade(feedbackContainer, 'in');
+                        requestAnimationFrame(() => applyFade(feedbackContainer, 'in'));
                     }, 300);
                 });
             }
@@ -102,7 +96,7 @@ function checkAnswer() {
     
     if (currentQuestionData.tipo === 'texto') {
         const userInput = document.getElementById('translation-input').value.trim();
-        userAnswer = userInput;
+        userAnswer = userInput || 'No answer'; 
         const correctOptions = currentQuestionData.answer.map(ans => ans.toLowerCase());
         isCorrect = correctOptions.includes(userAnswer.toLowerCase());
         correctAnswer = currentQuestionData.answer.join(' or ');
@@ -134,8 +128,7 @@ function loadNextQuestion() {
     setTimeout(() => {
         currentQuestionId++;
         loadQuestion().then(() => {
-            // Remove o fade-out para a próxima questão aparecer
-            cardsContainer.classList.remove('fade-out');
+            applyFade(cardsContainer, 'in');
         });
     }, 300);
 }
@@ -147,16 +140,28 @@ function handleEnterKey(event) {
     }
 }
 
-// --- INICIALIZAÇÃO DO QUIZ ---
+// --- INICIALIZAÇÃO E EVENTOS ---
+
 nextButton.addEventListener('click', checkAnswer);
 
+// Evento do formulário de dados do usuário
 userDataForm.addEventListener('submit', (event) => {
     event.preventDefault();
     applyFade(userDataContainer, 'out');
     setTimeout(() => {
         userDataContainer.style.display = 'none';
+        presentationContainer.style.display = 'block';
+        requestAnimationFrame(() => applyFade(presentationContainer, 'in'));
+    }, 300);
+});
+
+// Evento do botão 'Start Quiz' da tela de apresentação
+startQuizButton.addEventListener('click', () => {
+    applyFade(presentationContainer, 'out');
+    setTimeout(() => {
+        presentationContainer.style.display = 'none';
         quizContainer.style.display = 'block';
-        applyFade(quizContainer, 'in');
+        requestAnimationFrame(() => applyFade(quizContainer, 'in'));
         loadQuestion();
-    }, 300); 
+    }, 300);
 });

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Proficiency Test</title>
-    <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/logo-2.svg' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <script type="module" src="{% static 'js/main.js' %}"></script>
@@ -28,33 +28,49 @@
         </button>
     </nav>
 
-    <main class="main-content">
-        <div id="user-data-container">
-            <h2>We want to know you...</h2>
-            <form id="user-data-form">
-                <div class="form-row">
-                    <label for="user-email">E-mail:</label>
-                    <input type="email" id="user-email" name="email" placeholder="email@exemple.com">
-                </div>
-                <div class="form-row">
-                    <label for="user-name">Name:</label>
-                    <input type="text" id="user-name" name="name" placeholder="Your name">
-                </div>
-                <button type="submit">Submit</button>
-            </form>
+<main class="main-content">
+    <div id="presentation-container" style="display: none; transition: opacity 0.5s ease-in-out;">
+        <div class="logo">
+            <img src="{% static 'img/logo.svg' %}" alt="Portuguese Best Way Logo">
         </div>
+        <div class="info-box">
+            <h2>At BestWayPortuguese, we offer one-on-one classes that are 100% focused on you:</h2>
+            <p>
+                We'll work together on your specific goals, whether you want to master a new subject, improve your conversation, or overcome your biggest language challenges. Here, the pace and content are entirely up to you.
+            </p>
+        </div>
+        <p class="call-to-action">
+            Take the first step towards fluency! Take our free quiz to discover your strengths and the areas we can improve together. This way, we ensure your learning journey begins focused exactly on what you need.
+        </p>
+        <button id="start-quiz-button" class="start-quiz-button">Start Quiz</button>
+    </div>
 
-        <div class="quiz-container" style="display: none;">
-            <h2 id="question-title" class="question-title">Loading...</h2>
-            <div class="cards-container" id="cards-container">
-                </div>
-            <div class="buttons-container">
-                <button class="next-button" id="next-button">Next</button>
+    <div id="user-data-container">
+        <h2>We want to know you...</h2>
+        <form id="user-data-form">
+            <div class="form-row">
+                <label for="user-email">E-mail:</label>
+                <input type="email" id="user-email" name="email" placeholder="email@exemple.com">
             </div>
-        </div>
+            <div class="form-row">
+                <label for="user-name">Name:</label>
+                <input type="text" id="user-name" name="name" placeholder="Your name">
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
 
-        <div id="feedback-container" style="display: none;">
+    <div class="quiz-container" style="display: none;">
+        <h2 id="question-title" class="question-title">Loading...</h2>
+        <div class="cards-container" id="cards-container">
         </div>
-    </main>
+        <div class="buttons-container">
+            <button class="next-button" id="next-button">Next</button>
+        </div>
+    </div>
+
+    <div id="feedback-container" style="display: none;">
+    </div>
+</main>
 </body>
 </html>
