@@ -35,7 +35,6 @@ export async function fetchTeacher(teacherId) {
 }
 
 /**
- * NOVO: Busca a LISTA de professores da API.
  * @returns {Promise<Array>} Um array com os dados dos professores.
  */
 export async function fetchTeachers() {

@@ -18,6 +18,7 @@ body {
     justify-content: space-between; 
     align-items: center;
     border-bottom: 1px solid #cce8ee;
+    position: relative; /* Add this */
 }
 
 /* Estilo do logo */
@@ -31,6 +32,10 @@ body {
     color: #0d47a1; 
     font-size: 1.5em; 
     font-weight: bold;
+    /* Add these properties for centering */
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 /* Estilo para o botão do menu hamburguer */
