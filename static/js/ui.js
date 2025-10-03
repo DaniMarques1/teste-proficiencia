@@ -8,18 +8,12 @@ export function renderQuestionUI(question, container) {
     container.innerHTML = ''; // Limpa o conteúdo anterior
     let questionHTML = '';
 
-    if (question.tipo === 'texto') {
+    if (question.tipo === 'multipla') {
         questionHTML = `
             <div class="card">
                 <div class="card-header">Question</div>
                 <div class="card-content">
                     <span class="text text-to-speak" style="font-size: 1.4em; font-weight: normal;">${question.texto}</span>
-                    <button class="icon-button speak-button"><i class="fas fa-volume-up"></i></button>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-content">
-                    <span id="question-text" class="text text-to-speak">${question.questao}</span>
                     <button class="icon-button speak-button"><i class="fas fa-volume-up"></i></button>
                 </div>
             </div>
@@ -33,11 +27,11 @@ export function renderQuestionUI(question, container) {
         `;
         container.innerHTML = questionHTML;
         
-    } else if (question.tipo === 'multipla-escolha') {
+    } else if (question.tipo === 'unica') {
         questionHTML = `
             <div class="card">
                 <div class="card-content">
-                    <span id="question-text" class="text text-to-speak">${question.questao}</span>
+                    <span id="question-text" class="text text-to-speak">${question.texto}</span>
                     <button class="icon-button speak-button"><i class="fas fa-volume-up"></i></button>
                 </div>
             </div>
@@ -49,7 +43,7 @@ export function renderQuestionUI(question, container) {
         question.respostas.forEach(resposta => {
             const button = document.createElement('button');
             button.className = 'answer-option';
-            button.textContent = resposta.texto;
+            button.textContent = resposta.resposta;
             button.dataset.id = resposta.id;
             button.addEventListener('click', () => {
                 document.querySelectorAll('.answer-option.selected').forEach(btn => btn.classList.remove('selected'));
@@ -86,11 +80,11 @@ export function displayFeedbackScreen(resultados, teachers, titleElement, contai
         teachers.forEach(teacher => {
             teachersHTML += `
                 <div class="teacher-card">
-                    <img src="${teacher.photo_url}" alt="Photo of ${teacher.name}" class="teacher-photo">
+                    <img src="${teacher.foto_url}" alt="Photo of ${teacher.nome}" class="teacher-photo">
                     <div class="teacher-info">
-                        <h4>${teacher.name}</h4>
-                        <span class="teacher-langs">${teacher.native_langs}</span>
-                        <p>${teacher.description}</p>
+                        <h4>${teacher.nome}</h4>
+                        <span class="teacher-langs">${teacher.linguas}</span>
+                        <p>${teacher.texto}</p>
                         <a href="${teacher.link}" target="_blank" rel="noopener noreferrer" class="feedback-button">Take Class</a>
                     </div>
                 </div>

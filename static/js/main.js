@@ -26,7 +26,7 @@ async function loadQuestion() {
         const data = await fetchQuestion(currentQuestionId);
         currentQuestionData = data;
         
-        questionTitleElement.textContent = `Question ${data.id}: ${data.header}`;
+        questionTitleElement.textContent = `${data.titulo}`;
         renderQuestionUI(data, cardsContainer);
         initializeAudioFeatures();
         
@@ -94,16 +94,16 @@ function checkAnswer() {
     let userAnswer = '';
     let correctAnswer = '';
     
-    if (currentQuestionData.tipo === 'texto') {
+    if (currentQuestionData.tipo === 'multipla') {
         const userInput = document.getElementById('translation-input').value.trim();
         userAnswer = userInput || 'No answer'; 
         const correctOptions = currentQuestionData.answer.map(ans => ans.toLowerCase());
         isCorrect = correctOptions.includes(userAnswer.toLowerCase());
         correctAnswer = currentQuestionData.answer.join(' or ');
-    } else if (currentQuestionData.tipo === 'multipla-escolha') {
+    } else if (currentQuestionData.tipo === 'unica') {
         const correctOption = currentQuestionData.respostas.find(r => r.correta);
         const selectedOption = document.querySelector('.answer-option.selected');
-        correctAnswer = correctOption ? correctOption.texto : '';
+        correctAnswer = correctOption ? correctOption.resposta : '';
         if (selectedOption) {
             userAnswer = selectedOption.textContent;
             isCorrect = correctOption && (parseInt(selectedOption.dataset.id) === correctOption.id);
@@ -113,7 +113,7 @@ function checkAnswer() {
     }
     
     resultados.push({
-        question: currentQuestionData.questao,
+        question: currentQuestionData.texto,
         userAnswer,
         correctAnswer,
         isCorrect

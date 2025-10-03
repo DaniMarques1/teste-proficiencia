@@ -1,3 +1,3 @@
-from django.contrib import admin
+# Em seu_app/admin.py
 
-# Register your models here.
+from django.contrib import admin
