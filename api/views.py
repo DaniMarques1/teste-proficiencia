@@ -22,8 +22,8 @@ def get_teacher(request, teacher_id):
 
 def get_teachers(request):
     #Retorna a lista completa de professores como JSON, buscando os dados diretamente do banco.
-    if request.headers.get('sec-fetch-site') != 'same-origin':
-        return HttpResponseForbidden("Forbidden")
+    #if request.headers.get('sec-fetch-site') != 'same-origin':
+    #    return HttpResponseForbidden("Forbidden")
     
     professores = Professores.objects.all()
     data = [model_to_dict(p) for p in professores]
