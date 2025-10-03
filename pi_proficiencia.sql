@@ -15,14 +15,8 @@ USE pi_proficiencia;
 
 
 -- ========================
--- TABELA ADM
+-- TABELA ADM - EXCLUÍDA PARA NÃO ENTRAR EM CONFLITO COM O DJANGO
 -- ========================
-CREATE TABLE IF NOT EXISTS adm (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL,
-    email VARCHAR(100) NOT NULL UNIQUE,
-    senha VARCHAR(255) NOT NULL
-);
 
 -- ========================
 -- TABELA PROFESSORES
