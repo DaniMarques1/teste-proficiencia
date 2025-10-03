@@ -6,8 +6,8 @@ from questoes.models import Professores, Questoes
 def get_teacher(request, teacher_id):
     #Busca um professor pela sua ordem sequencial, não pelo seu ID real, consultando diretamente o banco de dados.
 
-    if request.headers.get('sec-fetch-site') != 'same-origin':
-        return HttpResponseForbidden("Forbidden")
+    #if request.headers.get('sec-fetch-site') != 'same-origin':
+    #    return HttpResponseForbidden("Forbidden")
 
     professores_queryset = Professores.objects.order_by('id')
     teacher_index = teacher_id - 1
