@@ -1,0 +1,43 @@
+services:
+  # Serviço do Banco de Dados MySQL
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
+    volumes:
+      - mysql_data:/var/lib/mysql
+    # A imagem do MySQL espera estas variáveis específicas.
+    # Nós as mapeamos a partir das suas variáveis no .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD} # Adicione esta ao .env
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    restart: always
+
+  # Serviço da Aplicação Django
+  app:
+    build: .
+    container_name: django_app
+    volumes:
+      - .:/app
+    # --- PORTA EXTERNA ALTERADA ---
+    # Mapeia a porta 8001 da VPS para a porta 8000 do contêiner.
+    ports:
+      - "8001:8000"
+    # --- VARIÁVEIS DE AMBIENTE AJUSTADAS ---
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=${DEBUG}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
+      - DB_ENGINE=django.db.backends.mysql
+      - DB_HOST=db  # Importante: o host é o nome do serviço 'db'
+      - DB_PORT=3306
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      - db
+    restart: always
+
+volumes:
+  mysql_data:

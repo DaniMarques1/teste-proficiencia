@@ -1,0 +1,20 @@
+# .dockerignore
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Ambiente virtual
+venv/
+.env
+
+# Cache do Python
+__pycache__/
+*.pyc
+
+# Banco de dados local
+db.sqlite3

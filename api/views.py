@@ -35,7 +35,7 @@ def get_question(request, question_id):
     # if request.headers.get('sec-fetch-site') != 'same-origin':
     #    return HttpResponseForbidden("Forbidden")
 
-    quantidade_questoes = 2
+    quantidade_questoes = 10
     questoes_queryset = Questoes.objects.prefetch_related('respostas_set').order_by('id')[:quantidade_questoes]
     question_index = question_id - 1
     
