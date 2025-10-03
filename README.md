@@ -34,12 +34,28 @@ py manage.py runserver
 ```
 
 ----------------------------------------------------------
+
+### Banco de dados:
+
+1 - Crie o database MySQL utilizando o arquivo "pi_proficiencia.sql".
+
+2 - Crie um arquivo nomeado ".env" para armazenar as seguintes variáveis de ambiente:
+```bash 
+DB_NAME=pi_proficiencia
+DB_USER=seuUsername
+DB_PASSWORD=suaSenha
+DB_HOST=hostDaSuaMaquina
+DB_PORT=portaParaConexao
+```
+
+----------------------------------------------------------
+
 ### Backend
 
 - Python
 - Django
 - Javascript
-- SQL
+- MySQL
 
 #### Frontend
 
