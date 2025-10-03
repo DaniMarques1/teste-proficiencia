@@ -200,11 +200,12 @@ body {
     border: 2px solid #b3e5fc;
     border-radius: 8px;
     padding: 15px;
-    font-size: 1.1em;
+    font-size: 1.3em;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.2s ease-in-out;
-    text-align: left;
+    text-align: center;
+    width: 100%;
 }
 
 .answer-option:hover {
