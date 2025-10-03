@@ -3,7 +3,7 @@ services:
     image: mysql:8.0
     container_name: mysql_db_local
     env_file:
-      - local.env
+      - prod.env
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_DATABASE: ${DB_NAME}
@@ -19,7 +19,7 @@ services:
     build: .
     container_name: django_app_local
     env_file:
-      - local.env
+      - prod.env
     volumes:
       - .:/app
       - static_volume:/app/staticfiles  

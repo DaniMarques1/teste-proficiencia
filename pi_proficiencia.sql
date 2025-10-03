@@ -85,9 +85,6 @@ CREATE TABLE IF NOT EXISTS niveis_dificuldade (
 -- INSERTS DE EXEMPLO
 -- ====================
 
-INSERT INTO adm (nome, email, senha) VALUES
-('Administrador', 'admin@pi.com', '123456');
-
 INSERT INTO professores (nome, email, telefone, foto_url, linguas, texto, link) VALUES
 ('Mari B.', 
 'a@example.com', 
