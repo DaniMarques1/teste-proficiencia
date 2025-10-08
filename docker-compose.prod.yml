@@ -21,7 +21,6 @@ services:
     env_file:
       - prod.env
     volumes:
-      - .:/app
       - static_volume:/app/staticfiles  
     depends_on:
       - db
