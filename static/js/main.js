@@ -1,4 +1,4 @@
-import { fetchQuestion, fetchTeachers, checkAnswerAPI } from './api.js';
+import { fetchQuestion, fetchTeachers } from './api.js';
 import { renderQuestionUI, displayFeedbackScreen, displayQuizFinished, applyFade } from './ui.js';
 import { initializeAudioFeatures } from './audio.js';
 
@@ -87,37 +87,39 @@ async function handleQuizEnd() {
     }
 }
 
-// main.js
-
-async function checkAnswer() {
-    console.log("1. A função checkAnswer() foi chamada."); // <-- ADICIONE AQUI
-
-    if (!currentQuestionData) {
-        console.log("Dados da questão atual não encontrados. Saindo.");
-        return;
+function checkAnswer() {
+    if (!currentQuestionData) return;
+    
+    let isCorrect = false;
+    let userAnswer = '';
+    let correctAnswer = '';
+    
+    if (currentQuestionData.tipo === 'multipla') {
+        const userInput = document.getElementById('translation-input').value.trim();
+        userAnswer = userInput || 'No answer'; 
+        const correctOptions = currentQuestionData.answer.map(ans => ans.toLowerCase());
+        isCorrect = correctOptions.includes(userAnswer.toLowerCase());
+        correctAnswer = currentQuestionData.answer.join(' or ');
+    } else if (currentQuestionData.tipo === 'unica') {
+        const correctOption = currentQuestionData.respostas.find(r => r.correta);
+        const selectedOption = document.querySelector('.answer-option.selected');
+        correctAnswer = correctOption ? correctOption.resposta : '';
+        if (selectedOption) {
+            userAnswer = selectedOption.textContent;
+            isCorrect = correctOption && (parseInt(selectedOption.dataset.id) === correctOption.id);
+        } else {
+            userAnswer = 'No answer';
+        }
     }
-
-    let userAnswer = 'No answer';
-    let userAnswerId = null;
-    const selectedOption = document.querySelector('.answer-option.selected');
-
-    if (selectedOption) {
-        userAnswer = selectedOption.textContent;
-        userAnswerId = parseInt(selectedOption.dataset.id);
-    }
-
-    console.log(`2. Enviando para a API: question_id=${currentQuestionData.id}, user_answer_id=${userAnswerId}`); // <-- ADICIONE AQUI
-
-    try {
-        const result = await checkAnswerAPI(currentQuestionData.id, userAnswerId);
-        console.log("4. Resposta da API recebida com sucesso:", result); // <-- ADICIONE AQUI
-
-        // ... resto do código try
-        
-    } catch (error) {
-        console.error("ERRO! A requisição falhou. Causa:", error); // <-- ADICIONE AQUI
-        alert('Não foi possível verificar sua resposta. Tente novamente.');
-    }
+    
+    resultados.push({
+        question: currentQuestionData.texto,
+        userAnswer,
+        correctAnswer,
+        isCorrect
+    });
+    
+    loadNextQuestion();
 }
 
 function loadNextQuestion() {

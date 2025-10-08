@@ -1,59 +1,35 @@
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
+// api.js
+
+/**
+ * Busca a lista ordenada de IDs de todas as questões disponíveis.
+ * @returns {Promise<Array<number>>} Uma promessa que resolve para um array de IDs.
+ */
+export async function fetchQuestionList() {
+    const response = await fetch(`/questions/`); // Novo endpoint
+    
+    if (!response.ok) {
+        const error = new Error('Falha ao buscar a lista de questões');
+        error.status = response.status;
+        throw error;
     }
-    return cookieValue;
+    
+    return await response.json();
 }
 
 /**
+ * Busca os dados de uma única questão pelo ID.
  * @param {number} questionId O ID da questão a ser buscada.
  * @returns {Promise<Object>} Os dados da questão.
  */
 export async function fetchQuestion(questionId) {
-    // ... (esta função continua igual)
     const response = await fetch(`/question/${questionId}`);
+    
     if (!response.ok) {
         const error = new Error('Falha ao buscar a questão');
         error.status = response.status;
         throw error;
     }
-    return await response.json();
-}
-
-
-/**
- * Envia a resposta do usuário para verificação no backend.
- * @param {number} questionId O ID da questão.
- * @param {number} userAnswerId O ID da resposta do usuário.
- * @returns {Promise<Object>} O resultado da verificação.
- */
-export async function checkAnswerAPI(questionId, userAnswerId) {
-    const csrftoken = getCookie('csrftoken');
-
-    const response = await fetch('/check_answer/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrftoken
-        },
-        body: JSON.stringify({
-            question_id: questionId,
-            user_answer_id: userAnswerId
-        })
-    });
-
-    if (!response.ok) {
-        throw new Error('Falha ao verificar a resposta');
-    }
-
+    
     return await response.json();
 }
 
