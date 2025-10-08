@@ -147,14 +147,38 @@ nextButton.addEventListener('click', checkAnswer);
 // Evento do formulário de dados do usuário
 userDataForm.addEventListener('submit', (event) => {
     event.preventDefault();
-    applyFade(userDataContainer, 'out');
-    setTimeout(() => {
-        userDataContainer.style.display = 'none';
-        presentationContainer.style.display = 'block';
-        requestAnimationFrame(() => applyFade(presentationContainer, 'in'));
-    }, 300);
-});
 
+    // Cria um objeto FormData diretamente do formulário.
+    // Ele captura todos os campos (name, email, aceita_contato) automaticamente.
+    const formData = new FormData(userDataForm);
+
+    // Envia os dados para a URL do Django que você criou
+    fetch('/api/salvar-usuario/', {
+        method: 'POST',
+        body: formData,
+        // headers: { 'X-CSRFToken': 'SEU_CSRF_TOKEN' } // Necessário para produção!
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Resposta do Django:', data);
+        if (data.status === 'success') {
+            // Se o Django salvou com sucesso, continue com a animação
+            applyFade(userDataContainer, 'out');
+            setTimeout(() => {
+                userDataContainer.style.display = 'none';
+                presentationContainer.style.display = 'block';
+                requestAnimationFrame(() => applyFade(presentationContainer, 'in'));
+            }, 300);
+        } else {
+            // Se o Django retornou um erro, mostre ao usuário
+            alert(`Erro: ${data.message}`);
+        }
+    })
+    .catch(error => {
+        console.error('Erro na requisição:', error);
+        alert('Não foi possível conectar ao servidor. Tente novamente mais tarde.');
+    });
+});
 // Evento do botão 'Start Quiz' da tela de apresentação
 startQuizButton.addEventListener('click', () => {
     applyFade(presentationContainer, 'out');
