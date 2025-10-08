@@ -59,7 +59,6 @@ def get_question(request, question_id):
     except IndexError:
         return JsonResponse({'error': f'Question number {question_id} not found.'}, status=404)
     
-@csrf_exempt # Use para testes. Em produção, configure o CSRF token no frontend.
 @require_http_methods(["POST"])
 def check_answer(request):
     try:
