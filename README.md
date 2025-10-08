@@ -16,6 +16,9 @@ git clone https://github.com/DaniMarques1/teste-proficiencia.git
 ```
 
 2 - Acesse a pasta *teste-proficiencia*.
+```bash
+cd teste-proficiencia
+```
 
 3 - Dentro da pasta, abra o prompt de comando e crie o ambiente virtual *venv* (Virtual Environment):
 ```bash
