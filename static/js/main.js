@@ -87,13 +87,18 @@ async function handleQuizEnd() {
     }
 }
 
+// main.js
+
 async function checkAnswer() {
-    if (!currentQuestionData) return;
+    console.log("1. A função checkAnswer() foi chamada."); // <-- ADICIONE AQUI
+
+    if (!currentQuestionData) {
+        console.log("Dados da questão atual não encontrados. Saindo.");
+        return;
+    }
 
     let userAnswer = 'No answer';
     let userAnswerId = null;
-
-    // Pega a resposta selecionada pelo usuário
     const selectedOption = document.querySelector('.answer-option.selected');
 
     if (selectedOption) {
@@ -101,23 +106,16 @@ async function checkAnswer() {
         userAnswerId = parseInt(selectedOption.dataset.id);
     }
 
+    console.log(`2. Enviando para a API: question_id=${currentQuestionData.id}, user_answer_id=${userAnswerId}`); // <-- ADICIONE AQUI
+
     try {
-        // Chama a API para verificar a resposta no backend
         const result = await checkAnswerAPI(currentQuestionData.id, userAnswerId);
+        console.log("4. Resposta da API recebida com sucesso:", result); // <-- ADICIONE AQUI
 
-        // Adiciona o resultado ao array de resultados
-        resultados.push({
-            question: currentQuestionData.titulo, // ou .texto
-            userAnswer,
-            correctAnswer: result.correct_answer,
-            isCorrect: result.is_correct
-        });
-
-        // Só então carrega a próxima questão
-        loadNextQuestion();
-
+        // ... resto do código try
+        
     } catch (error) {
-        console.error('Error checking answer:', error);
+        console.error("ERRO! A requisição falhou. Causa:", error); // <-- ADICIONE AQUI
         alert('Não foi possível verificar sua resposta. Tente novamente.');
     }
 }
