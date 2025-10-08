@@ -34,6 +34,35 @@ export async function fetchQuestion(questionId) {
 }
 
 /**
+ * Envia a resposta do usuário para o backend para verificação.
+ * @param {number} questionId O ID da questão.
+ * @param {number} answerId O ID da resposta escolhida.
+ * @param {string} csrftoken O token CSRF para a requisição POST.
+ * @returns {Promise<Object>} Um objeto com { is_correct: boolean, correct_answer_id: number, correct_answer_text: string }.
+ */
+export async function checkAnswerAPI(questionId, answerId, csrftoken) {
+    const response = await fetch(`/api/check-answer/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken 
+        },
+        body: JSON.stringify({
+            question_id: questionId,
+            answer_id: answerId
+        })
+    });
+
+    if (!response.ok) {
+        const error = new Error('Falha ao verificar a resposta');
+        error.status = response.status;
+        throw error;
+    }
+
+    return await response.json();
+}
+
+/**
  * Busca os dados de UM professor específico da API.
  * @param {number} teacherId O ID do professor a ser buscado.
  * @returns {Promise<Object>} Os dados do professor.
