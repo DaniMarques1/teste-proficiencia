@@ -145,40 +145,79 @@ function handleEnterKey(event) {
 nextButton.addEventListener('click', checkAnswer);
 
 // Evento do formulário de dados do usuário
+const csrftoken = getCookie('csrftoken'); // Pega o token na inicialização
+
 userDataForm.addEventListener('submit', (event) => {
     event.preventDefault();
-
-    // Cria um objeto FormData diretamente do formulário.
-    // Ele captura todos os campos (name, email, aceita_contato) automaticamente.
     const formData = new FormData(userDataForm);
 
-    // Envia os dados para a URL do Django que você criou
+    document.querySelectorAll('.error-message').forEach(el => el.remove());
+
     fetch('/api/salvar-usuario/', {
         method: 'POST',
         body: formData,
-        // headers: { 'X-CSRFToken': 'SEU_CSRF_TOKEN' } // Necessário para produção!
+        headers: {
+            'X-CSRFToken': csrftoken 
+        }
     })
     .then(response => response.json())
     .then(data => {
-        console.log('Resposta do Django:', data);
         if (data.status === 'success') {
-            // Se o Django salvou com sucesso, continue com a animação
+
             applyFade(userDataContainer, 'out');
+            
             setTimeout(() => {
                 userDataContainer.style.display = 'none';
-                presentationContainer.style.display = 'block';
-                requestAnimationFrame(() => applyFade(presentationContainer, 'in'));
-            }, 300);
-        } else {
-            // Se o Django retornou um erro, mostre ao usuário
-            alert(`Erro: ${data.message}`);
+                const quizContainer = document.getElementById('presentation-container'); 
+                
+                if (quizContainer) {
+                    quizContainer.style.display = 'block';
+                    requestAnimationFrame(() => applyFade(quizContainer, 'in'));
+                } else {
+                    console.error('Erro: O container do quiz não foi encontrado!');
+                }
+
+                iniciarQuiz(); 
+
+            }, 300); 
+
+
+        } else if (data.status === 'error') {
+            let errorMessages = [];
+            for (const field in data.errors) {
+                const errorList = data.errors[field];
+                if (errorList.length > 0) {
+                    const message = errorList[0].message; 
+                    errorMessages.push(`- ${message}`);
+                }
+            }
+            if (errorMessages.length > 0) {
+                alert(errorMessages.join('\n'));
+            }
         }
     })
     .catch(error => {
         console.error('Erro na requisição:', error);
-        alert('Não foi possível conectar ao servidor. Tente novamente mais tarde.');
+        alert('Ocorreu um erro de comunicação com o servidor.');
     });
 });
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
 // Evento do botão 'Start Quiz' da tela de apresentação
 startQuizButton.addEventListener('click', () => {
     applyFade(presentationContainer, 'out');

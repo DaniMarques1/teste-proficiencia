@@ -6,6 +6,7 @@ from contas.models import Usuarios
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
+from contas.forms import UsuarioForm
 import json
 
 def get_teacher(request, teacher_id):
@@ -59,37 +60,29 @@ def get_question(request, question_id):
 def index_view(request):
     return render(request, 'index.html')
 
-@csrf_exempt # Use para testes. Em produção, configure o CSRF token no seu JavaScript.
-@require_http_methods(["POST"]) # Garante que esta view só aceite requisições POST
+@require_http_methods(["POST"])
 def salvar_usuario(request):
     """
-    Recebe os dados do formulário via POST e salva um novo usuário no banco de dados.
+    Recebe os dados via POST, valida com o UsuarioForm e salva no banco.
     """
-    try:
-        # request.POST é usado para dados de formulário enviados via 'multipart/form-data' ou 'x-www-form-urlencoded'
-        nome = request.POST.get('name')
-        email = request.POST.get('email')
+    # Instancia o formulário com os dados recebidos via POST
+    form = UsuarioForm(request.POST)
 
-        aceita_contato = request.POST.get('aceita_contato') == 'true'
+    # O método is_valid() executa todas as validações (campos obrigatórios, email único, etc.)
+    if form.is_valid():
+        # O form.save() cria o objeto mas não o salva no banco ainda (commit=False)
+        novo_usuario = form.save(commit=False)
+        novo_usuario.criado_em = timezone.now()
+        novo_usuario.save() # Agora salva no banco
 
-        if not nome or not email:
-            return JsonResponse({'status': 'error', 'message': 'Name and e-mail required.'}, status=400)
-
-        # Verifica se o email já está cadastrado para evitar erro de violação de chave única
-        if Usuarios.objects.filter(email=email).exists():
-            return JsonResponse({'status': 'error', 'message': 'This email is already registered.'}, status=409) # 409 Conflict
-
-        # Cria a nova entrada no banco de dados
-        novo_usuario = Usuarios.objects.create(
-            nome=nome,
-            email=email,
-            aceita_contato=aceita_contato,
-            criado_em=timezone.now() # Adiciona a data e hora atuais
-        )
-
-        # Retorna uma resposta de sucesso
-        return JsonResponse({'status': 'success', 'message': f'Success'})
-
-    except Exception as e:
-        # Em caso de qualquer outro erro, retorna uma mensagem genérica
-        return JsonResponse({'status': 'error', 'message': f'Ocorreu um erro no servidor: {str(e)}'}, status=500)
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Cadastro realizado com sucesso!'
+        })
+    else:
+        # Se o formulário for inválido, retorna os erros em um formato JSON
+        # form.errors.as_json() cria um JSON com os campos e suas listas de erros
+        return JsonResponse({
+            'status': 'error',
+            'errors': form.errors.get_json_data()
+        }, status=400) # status 400 indica um Bad Request
