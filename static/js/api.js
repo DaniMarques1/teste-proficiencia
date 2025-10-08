@@ -42,7 +42,7 @@ export async function checkAnswerAPI(questionId, userAnswerId) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            // 'X-CSRFToken': csrftoken
+            'X-CSRFToken': csrftoken
         },
         body: JSON.stringify({
             question_id: questionId,
