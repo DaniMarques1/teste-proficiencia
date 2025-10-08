@@ -33,7 +33,7 @@ def get_teachers(request):
 
 def get_question(request, question_id):
     """
-    Busca uma questão e suas respectivas respostas, dentro de um limite total de 3 questões.
+    Busca uma questão e suas respectivas respostas, dentro de um limite definido.
     """
     try:
         quantidade_questoes = 3
