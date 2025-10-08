@@ -11,6 +11,10 @@ Desenvolver uma aplicação web com integração de inteligência artificial par
 
 1 - Baixe ou clone o repositório git.
 
+```bash
+git clone https://github.com/DaniMarques1/teste-proficiencia.git
+```
+
 2 - Acesse a pasta *teste-proficiencia*.
 
 3 - Dentro da pasta, abra o prompt de comando e crie o ambiente virtual *venv* (Virtual Environment):
@@ -28,24 +32,22 @@ venv/Scripts/activate
 pip install -r requirements.txt
 ```
 
-6 - Inicie o servidor Flask:
-```bash
-py manage.py runserver
-```
-
-----------------------------------------------------------
-
-### Banco de dados:
-
-1 - Crie o database MySQL utilizando o arquivo "pi_proficiencia.sql".
-
-2 - Crie um arquivo nomeado ".env" para armazenar as seguintes variáveis de ambiente:
+6 - Na pasta principal, crie um arquivo nomeado ".env" para armazenar as seguintes variáveis de ambiente:
 ```bash 
 DB_NAME=pi_proficiencia
-DB_USER=seuUsername
-DB_PASSWORD=suaSenha
-DB_HOST=hostDaSuaMaquina
-DB_PORT=portaParaConexao
+DB_USER=seuUsernameMYSQL
+DB_PASSWORD=suaSenhaMYSQL
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DEBUG=True
+ALLOWED_HOSTS=127.0.0.1,localhost
+```
+
+7 - Crie o database MySQL utilizando o arquivo "pi_proficiencia.sql".
+
+8 - Inicie o servidor Django:
+```bash
+py manage.py runserver
 ```
 
 ----------------------------------------------------------
