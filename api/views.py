@@ -30,22 +30,25 @@ def get_teachers(request):
     return JsonResponse(data, safe=False)
 
 def get_question(request, question_id):
-    quantidade_questoes = 3
-    questoes_queryset = Questoes.objects.prefetch_related('respostas_set').order_by('id')[:quantidade_questoes]
+    # A variável 'quantidade_questoes' foi removida.
+    # Agora filtramos por todas as questões que estão ativas.
+    questoes_queryset = Questoes.objects.filter(ativo=True).prefetch_related('respostas_set').order_by('id')
+    
+    # O restante da lógica para encontrar a questão pelo índice permanece o mesmo.
+    # O 'question_id' agora vai funcionar como um índice para a lista de questões ativas.
     question_index = question_id - 1
     
     try:
         questao_obj = questoes_queryset[question_index]
         question_data = model_to_dict(questao_obj)
 
-        # Modificação aqui! Construímos a lista de respostas manualmente.
         respostas_queryset = questao_obj.respostas_set.all()
         respostas_data = []
         for r in respostas_queryset:
             respostas_data.append({
                 'id': r.id,
                 'resposta': r.resposta,
-                'questao': r.questao.id 
+                'questao': r.questao.id
                 # O campo 'correta' NÃO é incluído
             })
 
@@ -54,7 +57,8 @@ def get_question(request, question_id):
         return JsonResponse(question_data)
 
     except IndexError:
-        return JsonResponse({'error': f'Question number {question_id} not found.'}, status=404)
+        # Se o índice for maior que o número de questões ativas, retorna erro.
+        return JsonResponse({'error': f'Question number {question_id} not found among active questions.'}, status=404)
     
 @require_http_methods(["POST"])
 @csrf_exempt # Para APIs simples, mas considere uma autenticação mais robusta no futuro

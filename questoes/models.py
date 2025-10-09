@@ -48,6 +48,7 @@ class Questoes(models.Model):
     microfone = models.BooleanField(default=False)
     criado_em = models.DateTimeField(blank=True, null=True)
     atualizado_em = models.DateTimeField(blank=True, null=True)
+    ativo = models.BooleanField(default=True)
 
     class Meta:
         managed = False

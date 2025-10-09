@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS questoes (
     tipo ENUM('unica','multipla','dissertativa') DEFAULT 'unica',
     nivel_dificuldade INT NOT NULL,
     microfone BOOLEAN DEFAULT FALSE,
+    ativo BOOLEAN DEFAULT FALSE,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

@@ -194,7 +194,7 @@ userDataForm.addEventListener('submit', (event) => {
                 const errorList = data.errors[field];
                 if (errorList.length > 0) {
                     const message = errorList[0].message; 
-                    errorMessages.push(`- ${message}`);
+                    errorMessages.push(`- ${field}: ${message}`);
                 }
             }
             if (errorMessages.length > 0) {
