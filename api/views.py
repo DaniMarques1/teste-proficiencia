@@ -61,19 +61,39 @@ def get_question(request, question_id):
         return JsonResponse({'error': f'Question number {question_id} not found among active questions.'}, status=404)
     
 @require_http_methods(["POST"])
-@csrf_exempt # Para APIs simples, mas considere uma autenticação mais robusta no futuro
+@csrf_exempt
 def check_answer(request):
     try:
         data = json.loads(request.body)
-        question_id = data.get('question_id')
+        # O 'question_id' recebido do frontend é o índice (ex: 1, 2, 3...)
+        question_index_id = data.get('question_id')
         answer_id = data.get('answer_id')
 
-        if not question_id or not answer_id:
-            return HttpResponseBadRequest("Missing question_id or answer_id")
+        if not question_index_id or not answer_id:
+            return HttpResponseBadRequest("Faltando question_id ou answer_id")
 
-        selected_answer = Respostas.objects.get(id=answer_id, questao_id=question_id)
+        # --- LÓGICA AJUSTADA ---
+        # 1. Buscamos o mesmo queryset da view get_question para garantir a consistência.
+        questoes_queryset = Questoes.objects.filter(ativo=True).order_by('id')
+        
+        # 2. Convertemos o índice recebido (1, 2, 3...) para um índice de lista (0, 1, 2...).
+        question_index = int(question_index_id) - 1
 
-        correct_answer = Respostas.objects.get(questao_id=question_id, correta=True)
+        # Validação para evitar índices negativos
+        if question_index < 0:
+            return JsonResponse({'error': f'O número da questão ({question_index_id}) é inválido.'}, status=404)
+        
+        # 3. Pegamos o objeto da questão real a partir do seu índice na lista.
+        questao_obj = questoes_queryset[question_index]
+        
+        # 4. AGORA SIM, usamos o ID real do objeto para checar a resposta.
+        real_question_id = questao_obj.id
+        # --- FIM DO AJUSTE ---
+
+        # O restante da lógica permanece igual, mas agora usando o ID real que encontramos.
+        selected_answer = Respostas.objects.get(id=answer_id, questao_id=real_question_id)
+
+        correct_answer = Respostas.objects.get(questao_id=real_question_id, correta=True)
 
         is_correct = (selected_answer.id == correct_answer.id)
 
@@ -83,8 +103,11 @@ def check_answer(request):
             'correct_answer_text': correct_answer.resposta
         })
 
+    except IndexError:
+        # Este erro ocorre se o question_index_id for maior que o número de questões ativas.
+        return JsonResponse({'error': f'Questão número {question_index_id} não encontrada.'}, status=404)
     except Respostas.DoesNotExist:
-        return JsonResponse({'error': 'Answer or Question not found.'}, status=404)
+        return JsonResponse({'error': 'Resposta ou Questão não encontrada.'}, status=404)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
