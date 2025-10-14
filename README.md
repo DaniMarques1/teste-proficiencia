@@ -34,6 +34,7 @@ pip install -r requirements.txt
 
 6 - Na pasta principal, crie um arquivo nomeado ".env" para armazenar as seguintes variáveis de ambiente:
 ```bash 
+DB_ENGINE=django.db.backends.mysql
 DB_NAME=pi_proficiencia
 DB_USER=seuUsernameMYSQL
 DB_PASSWORD=suaSenhaMYSQL
