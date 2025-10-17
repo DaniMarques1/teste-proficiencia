@@ -42,6 +42,8 @@ DB_HOST=127.0.0.1
 DB_PORT=3306
 DEBUG=True
 ALLOWED_HOSTS=127.0.0.1,localhost
+EMAIL_HOST_USER=seuEnderecoDeEmail
+EMAIL_HOST_PASSWORD=suaSenhaDoEmail
 ```
 
 7 - Crie o database MySQL utilizando o arquivo "pi_proficiencia.sql".
