@@ -57,25 +57,38 @@ async function handleQuizEnd() {
     nextButton.style.display = 'none';
 
     try {
+        // 1️⃣ Primeiro envia resultados para o backend (gera relatório e recebe pontos fortes/fracos)
+        const reportData = await sendResultsToBackend(); // <- chamada principal
+
+        // 2️⃣ Depois busca professores normalmente
         const teachers = await fetchTeachers();
 
+        // 3️⃣ Exibe o feedback com base nas respostas do backend
         setTimeout(() => {
             quizContainer.style.display = 'none';
             feedbackContainer.style.display = 'block';
-            
-            displayFeedbackScreen(resultados, teachers, questionTitleElement, feedbackContainer);
-            
+
+            // Renderiza o feedback com os dados da IA (pontos fortes e fracos)
+            displayFeedbackScreen(
+                resultados,
+                teachers,
+                questionTitleElement,
+                feedbackContainer,
+                reportData?.pontos_fortes || [],
+                reportData?.pontos_a_desenvolver || []
+            );
+
             requestAnimationFrame(() => applyFade(feedbackContainer, 'in'));
 
             const emailButton = document.getElementById('get-results-button');
             const showDetailsButton = document.getElementById('show-details-button');
-            
+
             if (emailButton) {
                 emailButton.addEventListener('click', () => {
                     alert('Funcionalidade de envio de email a ser implementada!');
                 });
             }
-            
+
             if (showDetailsButton) {
                 showDetailsButton.addEventListener('click', () => {
                     applyFade(feedbackContainer, 'out');
@@ -85,15 +98,17 @@ async function handleQuizEnd() {
                     }, 300);
                 });
             }
-            
+
         }, 300);
+
     } catch (error) {
-        console.error("Erro ao buscar professores:", error);
+        console.error("Erro ao finalizar quiz:", error);
         questionTitleElement.textContent = 'Erro ao carregar resultados';
         feedbackContainer.innerHTML = `<p>Não foi possível carregar as recomendações. Tente novamente mais tarde.</p>`;
         feedbackContainer.style.display = 'block';
     }
 }
+
 
 async function checkAnswer() {
     if (!currentQuestionData) return;
@@ -136,6 +151,47 @@ async function checkAnswer() {
         alert('Não foi possível verificar sua resposta. Tente novamente.');
     }
 }
+
+async function sendResultsToBackend() {
+    const csrftoken = getCookie('csrftoken');
+
+    const respostas = resultados.map(r => 
+        `Question: ${r.question} | Your answer: ${r.userAnswer} | Correct answer: ${r.correctAnswer}`
+    );
+
+    const payload = {
+        nome_aluno: "Rafael Souza",
+        respostas: respostas,
+        nivel: "A1 Intermediário",
+        nota_final: 30,
+        pdf: false
+    };
+
+    try {
+        const response = await fetch("/gerar-relatorio/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrftoken
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            console.log("✅ Relatório gerado com sucesso:", data);
+            return data; // <-- RETORNA O JSON (pontos fortes e fracos)
+        } else {
+            alert("Erro ao gerar feedback: " + data.erro);
+            return null;
+        }
+    } catch (error) {
+        console.error("Erro ao enviar resultados:", error);
+        return null;
+    }
+}
+
 
 function loadNextQuestion() {
     applyFade(cardsContainer, 'out');

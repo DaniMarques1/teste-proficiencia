@@ -26,5 +26,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('api.urls')),
     path('', index_view, name='home'), 
-    path('ia/', include('ia.urls')),
+    path('', include('ia.urls')),
 ]

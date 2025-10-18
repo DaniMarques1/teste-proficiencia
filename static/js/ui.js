@@ -91,15 +91,23 @@ export function renderQuestionUI(question, container) {
  * @param {HTMLElement} container - O elemento onde o feedback será renderizado.
  */
 // 1. Adicione 'teachers' como um novo parâmetro
-export function displayFeedbackScreen(resultados, teachers, titleElement, container) {
+export function displayFeedbackScreen(
+    resultados,
+    teachers,
+    titleElement,
+    container,
+    strengths = [],
+    improvements = []
+) {
     titleElement.textContent = 'Quiz Results';
     container.innerHTML = '';
 
     const totalQuestoes = resultados.length;
     const acertos = resultados.filter(r => r.isCorrect).length;
 
-    const strengths = ["Use of Simple Past Tense", "Food Vocabulary", "Gender Agreement"];
-    const improvements = ["Use of the Subjunctive", "Difference between 'ser' and 'estar'", "Object Pronouns"];
+    // fallback se IA não retornar
+    if (strengths.length === 0) strengths = ["Compreensão geral boa.", "Vocabulário básico sólido."];
+    if (improvements.length === 0) improvements = ["Precisa revisar tempos verbais.", "Melhorar ortografia."];
     
     let teachersHTML = '';
     if (teachers && teachers.length > 0) {
