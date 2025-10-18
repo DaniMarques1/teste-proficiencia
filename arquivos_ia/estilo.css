@@ -1,0 +1,245 @@
+/* Importação de fonte do Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+/* Variáveis de Cor para fácil customização */
+:root {
+    --cor-azul-escuro: #0D2C4F;
+    --cor-azul-claro: #F0F4F8;
+    --cor-verde: #00A86B;
+    --cor-texto-principal: #333;
+    --cor-texto-secundario: #666;
+    --cor-borda: #EAECEF;
+}
+
+@page {
+    size: A4;
+}
+
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--cor-azul-claro);
+    color: var(--cor-texto-principal);
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+}
+
+.certificate-container {
+    max-width: 1500px;
+    margin: 0 auto;
+    background-color: #fff;
+    border-radius: 1px;
+    overflow: hidden;
+}
+
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+
+.logo-container img {
+    max-height: 35px;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+
+
+.title-container p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--cor-texto-secundario);
+}
+
+
+.student-info {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.student-info h1 {
+    font-size: 34px;
+    margin: 0 0 8px 0;
+    color: var(--cor-azul-escuro);
+}
+
+.student-info p {
+    margin: 0;
+    font-size: 15px; /* Ajustando font-size */
+    color: var(--cor-texto-secundario);
+}
+
+/* --- Seção de Scores --- */
+.scores-section {
+    display: flex;
+    align-items: center;
+    gap: 30px; /* Reduzindo o gap */
+    margin-bottom: 40px;
+    background-color: var(--cor-azul-claro);
+    padding: 25px; /* Reduzindo o padding */
+    border-radius: 8px;
+    flex-wrap: nowrap; /* Garante que os itens não quebrem linha */
+    justify-content: center; /* Centraliza se houver espaço */
+}
+
+.main-score {
+    flex-shrink: 0;
+    width: 160px; /* Reduzindo um pouco */
+    height: 160px; /* Reduzindo um pouco */
+    border: 7px solid var(--cor-verde); /* Ajustando borda */
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.main-score .score-value {
+    font-size: 42px; /* Ajustando font-size */
+    font-weight: 700;
+    color: var(--cor-azul-escuro);
+    line-height: 1;
+}
+.main-score .score-value span {
+    font-size: 22px; /* Ajustando font-size */
+    font-weight: 400;
+    color: var(--cor-texto-secundario);
+}
+.main-score .score-level {
+    font-size: 16px; /* Ajustando font-size */
+    font-weight: 600;
+    color: var(--cor-verde);
+    margin-top: 4px;
+}
+
+.skills-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px; /* Reduzindo o gap entre os itens do grid */
+    flex-grow: 1; /* Permite que o grid ocupe o espaço restante */
+}
+
+.skill-item {
+    text-align: center;
+    background-color: #fff;
+    padding: 12px; /* Reduzindo o padding */
+    border-radius: 8px;
+    border: 1px solid var(--cor-borda);
+    /* Garante que o texto não quebre para caber */
+    word-wrap: break-word; 
+    white-space: normal; /* Garante que o texto quebre naturalmente se for muito longo */
+}
+
+.skill-item .skill-score {
+    font-size: 26px; /* Ajustando font-size */
+    font-weight: 700;
+    color: var(--cor-azul-escuro);
+}
+.skill-item .skill-level {
+    font-size: 11px; /* Ajustando font-size */
+    color: var(--cor-verde);
+    margin: 1px 0;
+    font-weight: 600;
+}
+.skill-item .skill-name {
+    font-size: 13px; /* Ajustando font-size */
+    color: var(--cor-texto-secundario);
+}
+
+/* --- Seção da Análise --- */
+.analysis-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px; /* Reduzindo o gap */
+    margin-bottom: 30px;
+}
+
+.analysis-box {
+    border-radius: 8px;
+    padding: 20px; /* Reduzindo o padding */
+}
+
+.analysis-box h3 {
+    margin: 0 0 12px 0;
+    font-size: 17px; /* Ajustando font-size */
+    padding-bottom: 8px;
+    border-bottom: 2px solid;
+}
+
+.analysis-box ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.analysis-box li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px; /* Reduzindo o gap */
+    padding: 8px 0; /* Reduzindo o padding */
+}
+
+.analysis-box li span {
+    flex: 1;
+    font-size: 14px; /* Ajustando font-size */
+}
+
+.analysis-box li svg {
+    flex-shrink: 0;
+    margin-top: 1px;
+    width: 18px; /* Ajustando tamanho do ícone */
+    height: 18px; /* Ajustando tamanho do ícone */
+}
+
+.strength-box {
+    background-color: #F0FAF6;
+    border: 1px solid #D9F2E7;
+}
+.strength-box h3 {
+    color: var(--cor-verde);
+    border-color: var(--cor-verde);
+}
+.strength-box svg {
+    stroke: var(--cor-verde);
+}
+
+.development-box {
+    background-color: var(--cor-azul-claro);
+    border: 1px solid #D6E0EA;
+}
+.development-box h3 {
+    color: var(--cor-azul-escuro);
+    border-color: var(--cor-azul-escuro);
+}
+.development-box svg {
+    stroke: var(--cor-azul-escuro);
+}
+
+/* --- Rodapé --- */
+.footer {
+    text-align: center;
+    padding-top: 15px; /* Reduzindo padding */
+    border-top: 1px solid var(--cor-borda);
+    font-size: 11px; /* Ajustando font-size */
+    color: var(--cor-texto-secundario);
+}
+.footer p {
+    margin: 4px 0;
+}
+
+/* Regras específicas para impressão para garantir que as cores sejam mantidas */
+@media print {
+    body {
+        background-color: #fff !important; /* Força fundo branco */
+    }
+    .certificate-container {
+        box-shadow: none !important; /* Remove sombra na impressão */
+        border: none !important; /* Remove borda na impressão */
+    }
+    
+}
