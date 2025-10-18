@@ -152,19 +152,26 @@ async function checkAnswer() {
     }
 }
 
+
 async function sendResultsToBackend() {
     const csrftoken = getCookie('csrftoken');
 
-    const respostas = resultados.map(r => 
+    // Mapeia os resultados para o formato esperado pelo prompt da IA
+    const respostas = resultados.map(r =>
         `Question: ${r.question} | Your answer: ${r.userAnswer} | Correct answer: ${r.correctAnswer}`
     );
 
+    // ✅ (Sugestão) Calcule a nota dinamicamente
+    const acertos = resultados.filter(r => r.isCorrect).length;
+    const nota_final = Math.round((acertos / resultados.length) * 100); // Ex: nota de 0 a 100
+
     const payload = {
-        nome_aluno: "Rafael Souza",
+        // ✅ (Sugestão) Pegue o nome do usuário do formulário inicial, se disponível
+        nome_aluno: document.getElementById('nome')?.value || "Aluno",
         respostas: respostas,
-        nivel: "A1 Intermediário",
-        nota_final: 30,
-        pdf: false
+        nivel: "A1 Intermediário", // Pode ser determinado dinamicamente também
+        nota_final: nota_final,
+        pdf: true // <-- Essencial para receber o JSON de volta
     };
 
     try {
@@ -177,13 +184,14 @@ async function sendResultsToBackend() {
             body: JSON.stringify(payload)
         });
 
+        // O response.json() agora vai funcionar, pois a view retornará JSON
         const data = await response.json();
 
         if (response.ok) {
-            console.log("✅ Relatório gerado com sucesso:", data);
-            return data; // <-- RETORNA O JSON (pontos fortes e fracos)
+            console.log("✅ Análise da IA recebida com sucesso:", data);
+            return data; // <-- Retorna o JSON {pontos_fortes, pontos_a_desenvolver}
         } else {
-            alert("Erro ao gerar feedback: " + data.erro);
+            alert("Erro ao gerar feedback: " + (data.erro || "Erro desconhecido"));
             return null;
         }
     } catch (error) {

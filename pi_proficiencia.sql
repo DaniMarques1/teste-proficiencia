@@ -129,7 +129,7 @@ INSERT INTO niveis_dificuldade (id, nivel, peso) VALUES
 
 -- Questão 1
 INSERT INTO questoes (questao, texto, tipo, nivel_dificuldade, microfone, explicacao) VALUES
-('Q1', 'Questão 1 - Intermediário', 'Qual é a tradução correta de "house" em português?', 'unica', 2, FALSE, 'teste');
+('Q1', 'Qual é a tradução correta de "house" em português?', 'unica', 2, FALSE, 'teste');
 INSERT INTO respostas (questao_id, resposta, correta, ordem) VALUES
 (LAST_INSERT_ID(), 'Casa', TRUE, 1),
 (LAST_INSERT_ID(), 'Carro', FALSE, 2),
@@ -138,7 +138,7 @@ INSERT INTO respostas (questao_id, resposta, correta, ordem) VALUES
 
 -- Questão 2
 INSERT INTO questoes (questao, texto, tipo, nivel_dificuldade, microfone, explicacao) VALUES
-('Q2', 'Questão 2 - Intermediário', 'Complete a frase: Eu ____ ao Brasil no ano passado.', 'unica', 2, FALSE, 'teste');
+('Q2', 'Complete a frase: Eu ____ ao Brasil no ano passado.', 'unica', 2, FALSE, 'teste');
 INSERT INTO respostas (questao_id, resposta, correta, ordem) VALUES
 (LAST_INSERT_ID(), 'foi', FALSE, 1),
 (LAST_INSERT_ID(), 'fui', TRUE, 2),
@@ -147,7 +147,7 @@ INSERT INTO respostas (questao_id, resposta, correta, ordem) VALUES
 
 -- Questão 3
 INSERT INTO questoes (questao, texto, tipo, nivel_dificuldade, microfone, explicacao) VALUES
-('Q3', 'Questão 3 - Intermediário', 'Qual das opções está no plural?', 'unica', 2, FALSE, 'teste');
+('Q3', 'Qual das opções está no plural?', 'unica', 2, FALSE, 'teste');
 INSERT INTO respostas (questao_id, resposta, correta, ordem) VALUES
 (LAST_INSERT_ID(), 'Cadeira', FALSE, 1),
 (LAST_INSERT_ID(), 'Mesa', FALSE, 2),
@@ -156,7 +156,7 @@ INSERT INTO respostas (questao_id, resposta, correta, ordem) VALUES
 
 -- Questão 4
 INSERT INTO questoes (questao, texto, tipo, nivel_dificuldade, microfone, explicacao) VALUES
-('Q4', 'Questão 4 - Intermediário', 'Qual é a forma correta: "Eles ____ estudando português."', 'unica', 2, FALSE, 'teste');
+('Q4', 'Qual é a forma correta: "Eles ____ estudando português."', 'unica', 2, FALSE, 'teste');
 INSERT INTO respostas (questao_id, resposta, correta, ordem) VALUES
 (LAST_INSERT_ID(), 'estão', TRUE, 1),
 (LAST_INSERT_ID(), 'está', FALSE, 2),
@@ -165,7 +165,7 @@ INSERT INTO respostas (questao_id, resposta, correta, ordem) VALUES
 
 -- Questão 5
 INSERT INTO questoes (questao, texto, tipo, nivel_dificuldade, microfone, explicacao) VALUES
-('Q5', 'Questão 5 - Intermediário', 'Marque a alternativa que corresponde a um verbo:', 'unica', 2, FALSE, 'teste');
+('Q5', 'Marque a alternativa que corresponde a um verbo:', 'unica', 2, FALSE, 'teste');
 INSERT INTO respostas (questao_id, resposta, correta, ordem) VALUES
 (LAST_INSERT_ID(), 'Correr', TRUE, 1),
 (LAST_INSERT_ID(), 'Bonito', FALSE, 2),
@@ -174,7 +174,7 @@ INSERT INTO respostas (questao_id, resposta, correta, ordem) VALUES
 
 -- Questão 6
 INSERT INTO questoes (questao, texto, tipo, nivel_dificuldade, microfone, explicacao) VALUES
-('Q6', 'Questão 6 - Intermediário', 'Qual é o antônimo de "feliz"?', 'unica', 2, FALSE, 'teste');
+('Q6', 'Qual é o antônimo de "feliz"?', 'unica', 2, FALSE, 'teste');
 INSERT INTO respostas (questao_id, resposta, correta, ordem) VALUES
 (LAST_INSERT_ID(), 'Alegre', FALSE, 1),
 (LAST_INSERT_ID(), 'Triste', TRUE, 2),
@@ -183,7 +183,7 @@ INSERT INTO respostas (questao_id, resposta, correta, ordem) VALUES
 
 -- Questão 7
 INSERT INTO questoes (questao, texto, tipo, nivel_dificuldade, microfone, explicacao) VALUES
-('Q7', 'Questão 7 - Intermediário', 'Qual das palavras abaixo é um substantivo?', 'unica', 2, FALSE, 'teste');
+('Q7', 'Qual das palavras abaixo é um substantivo?', 'unica', 2, FALSE, 'teste');
 INSERT INTO respostas (questao_id, resposta, correta, ordem) VALUES
 (LAST_INSERT_ID(), 'Correr', FALSE, 1),
 (LAST_INSERT_ID(), 'Amor', TRUE, 2),
@@ -192,7 +192,7 @@ INSERT INTO respostas (questao_id, resposta, correta, ordem) VALUES
 
 -- Questão 8
 INSERT INTO questoes (questao, texto, tipo, nivel_dificuldade, microfone, explicacao) VALUES
-('Q8', 'Questão 8 - Intermediário', 'Escolha a opção que está no futuro: "Amanhã eu ____ ao cinema."', 'unica', 2, FALSE, 'teste');
+('Q8', 'Escolha a opção que está no futuro: "Amanhã eu ____ ao cinema."', 'unica', 2, FALSE, 'teste');
 INSERT INTO respostas (questao_id, resposta, correta, ordem) VALUES
 (LAST_INSERT_ID(), 'Fui', FALSE, 1),
 (LAST_INSERT_ID(), 'Vou', TRUE, 2),
@@ -201,7 +201,7 @@ INSERT INTO respostas (questao_id, resposta, correta, ordem) VALUES
 
 -- Questão 9
 INSERT INTO questoes (questao, texto, tipo, nivel_dificuldade, microfone, explicacao) VALUES
-('Q9', 'Questão 9 - Intermediário', 'Qual das frases está correta?', 'unica', 2, FALSE, 'teste');
+('Q9', 'Qual das frases está correta?', 'unica', 2, FALSE, 'teste');
 INSERT INTO respostas (questao_id, resposta, correta, ordem) VALUES
 (LAST_INSERT_ID(), 'Nós vai ao mercado.', FALSE, 1),
 (LAST_INSERT_ID(), 'Nós vamos ao mercado.', TRUE, 2),
@@ -210,7 +210,7 @@ INSERT INTO respostas (questao_id, resposta, correta, ordem) VALUES
 
 -- Questão 10
 INSERT INTO questoes (questao, texto, tipo, nivel_dificuldade, microfone, explicacao) VALUES
-('Q10', 'Questão 10 - Intermediário', 'Qual é o feminino de "menino"?', 'unica', 2, FALSE, 'teste');
+('Q10', 'Qual é o feminino de "menino"?', 'unica', 2, FALSE, 'teste');
 INSERT INTO respostas (questao_id, resposta, correta, ordem) VALUES
 (LAST_INSERT_ID(), 'Menina', TRUE, 1),
 (LAST_INSERT_ID(), 'Mulher', FALSE, 2),
@@ -219,7 +219,7 @@ INSERT INTO respostas (questao_id, resposta, correta, ordem) VALUES
 
 -- Questão 11
 INSERT INTO questoes (questao, texto, tipo, nivel_dificuldade, microfone, explicacao) VALUES
-('Q11', 'Questão 11 - Intermediário', 'Qual destas palavras é um adjetivo?', 'unica', 2, FALSE, 'teste');
+('Q11', 'Qual destas palavras é um adjetivo?', 'unica', 2, FALSE, 'teste');
 INSERT INTO respostas (questao_id, resposta, correta, ordem) VALUES
 (LAST_INSERT_ID(), 'Mesa', FALSE, 1),
 (LAST_INSERT_ID(), 'Correr', FALSE, 2),
@@ -228,7 +228,7 @@ INSERT INTO respostas (questao_id, resposta, correta, ordem) VALUES
 
 -- Questão 12
 INSERT INTO questoes (questao, texto, tipo, nivel_dificuldade, microfone, explicacao) VALUES
-('Q12', 'Questão 12 - Intermediário', 'Escolha a frase no passado.', 'unica', 2, FALSE, 'teste');
+('Q12', 'Escolha a frase no passado.', 'unica', 2, FALSE, 'teste');
 INSERT INTO respostas (questao_id, resposta, correta, ordem) VALUES
 (LAST_INSERT_ID(), 'Eu estudo todos os dias.', FALSE, 1),
 (LAST_INSERT_ID(), 'Eu estudei ontem.', TRUE, 2),

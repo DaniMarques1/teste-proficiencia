@@ -28,23 +28,32 @@ def avaliacao_modelo__gpt(history):
 
 @csrf_exempt
 def gerar_relatorio(request):
-    """View principal: gera um relatório PDF com avaliação automática."""
+    """
+    View principal: gera um relatório com avaliação automática.
+    Sempre retorna um JSON com a análise da IA.
+    Se solicitado, também salva um PDF completo no servidor.
+    """
     if request.method != "POST":
         return JsonResponse({"erro": "Método não permitido. Use POST."}, status=405)
 
     try:
-        # Dados simulados — podem vir via request.POST futuramente
-        respostas = [
-            'Question: Qual é a tradução correta de "house" em português? Your answer: Casa',
-            'Question: Complete a frase: Eu ____ ao Brasil no ano passado.Your answer: fui',
-            'Question: Qual das opções está no plural? Your answer: Livros'
-        ]
-        nivel = "A1 Intermediário"
-        nota_final = 30
+        # 1. Ler o corpo da requisição
+        data = json.loads(request.body)
 
-        # Histórico da conversa
-        history_modelo = [{
-            "role": "system",
+        # 2. Extrair os dados do payload
+        nome_aluno = data.get("nome_aluno", "Aluno_Anonimo")
+        respostas = data.get("respostas", [])
+        nivel = data.get("nivel", "Não especificado")
+        nota_final = data.get("nota_final", 0)
+        quer_pdf = data.get("pdf", False)
+
+        if not respostas:
+            return JsonResponse({"erro": "Nenhuma resposta fornecida para análise."}, status=400)
+
+        # 3. Montar e enviar o prompt para a IA
+        history_modelo = [
+            {
+                "role": "system",
                 "content": """Você é um avaliador de proficiência na lingua portuguesa;
                 você receberá quertões com as respostas que o aluno assinalou no teste
                 Você deverá responder a duas questões: 
@@ -60,24 +69,21 @@ def gerar_relatorio(request):
                 "pontos_a_desenvolver": [
                     "Uso de vocabulário mais específico em contextos técnicos ou de negócios.",
                     "Maior atenção aos tempos verbais subjuntivos em cenários hipotéticos."
-                ]}
-                
-                """
-        }, {
-            "role": "user",
-            "content": "\n".join(respostas)
-        }]
+                ]}"""
+            },
+            {
+                "role": "user",
+                "content": "\n".join(respostas)
+            }
+        ]
 
-        # Tentativas com tratamento de erro
+        # Lógica para chamar a IA com retentativas
         max_tentativas = 3
-        sucesso = False
         resposta_final = {}
-
         for tentativa in range(max_tentativas):
             try:
                 resposta_ia = avaliacao_modelo__gpt(history_modelo)
                 resposta_final = json.loads(resposta_ia)
-                sucesso = True
                 break
             except json.JSONDecodeError:
                 if tentativa < max_tentativas - 1:
@@ -88,29 +94,44 @@ def gerar_relatorio(request):
                         "pontos_a_desenvolver": ["Falha ao analisar a resposta da API."]
                     }
 
-        # Montar dados para o template
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        dados_aluno = {
-            "nome_aluno": "Rafael Souza",
-            **resposta_final,
-            "nivel": nivel,
-            "nota_final": nota_final,
-            "data_emissao": datetime.date.today().strftime('%d de %B de %Y')
-        }
+        # 4. Se a geração de PDF foi solicitada, crie e salve o arquivo
+        #    Esta lógica agora é executada ANTES de enviar a resposta final.
+        if quer_pdf:
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            
+            # Contexto completo para o template do PDF
+            dados_template = {
+                "nome_aluno": nome_aluno,
+                **resposta_final,
+                "nivel": nivel,
+                "nota_final": nota_final,
+                "data_emissao": datetime.date.today().strftime('%d de %B de %Y')
+            }
 
-        # Renderizar HTML e gerar PDF
-        env = Environment(loader=FileSystemLoader(script_dir))
-        template = env.get_template('template.html')
-        html_final = template.render(dados_aluno)
+            env = Environment(loader=FileSystemLoader(script_dir))
+            template = env.get_template('template.html')
+            html_final = template.render(dados_template)
+            
+            # ✅ GERA UM NOME DE ARQUIVO ÚNICO PARA NÃO SOBRESCREVER
+            timestamp = int(time.time())
+            nome_arquivo_pdf = f'relatorio_{nome_aluno.replace(" ", "_")}_{timestamp}.pdf'
 
-        pdf_file = os.path.join(script_dir, 'Relatorio_Retrato.pdf')
-        HTML(string=html_final, base_url=script_dir).write_pdf(pdf_file, presentational_hints=True, media='print')
+            # Considere criar um diretório 'temp_reports' para organizar os PDFs
+            # Ex: pdf_path = os.path.join(script_dir, 'temp_reports', nome_arquivo_pdf)
+            pdf_path = os.path.join(script_dir, nome_arquivo_pdf)
 
-        # Retornar PDF na resposta
-        with open(pdf_file, 'rb') as f:
-            response = HttpResponse(f.read(), content_type='application/pdf')
-            response['Content-Disposition'] = 'attachment; filename="Relatorio_Retrato.pdf"'
-            return response
+            # Salva o PDF no caminho especificado
+            HTML(string=html_final, base_url=script_dir).write_pdf(pdf_path, presentational_hints=True)
+            
+            # Adicionamos uma informação extra no JSON para o frontend saber que o PDF foi gerado
+            resposta_final["pdf_gerado"] = nome_arquivo_pdf
 
+        # 5. Retorne SEMPRE a resposta JSON para o frontend
+        return JsonResponse(resposta_final, status=200)
+
+    except json.JSONDecodeError:
+        return JsonResponse({"erro": "Payload JSON inválido."}, status=400)
     except Exception as e:
-        return JsonResponse({"erro": str(e)}, status=500)
+        # Para depuração, é bom logar o erro real
+        print(f"Erro inesperado: {e}")
+        return JsonResponse({"erro": "Ocorreu um erro interno no servidor."}, status=500)
