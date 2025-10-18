@@ -12,7 +12,6 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 import json
 
 def get_teacher(request, teacher_id):
-    professores_queryset = Professores.objects.order_by('id')
     teacher_index = teacher_id - 1
     
     try:
@@ -30,17 +29,16 @@ def get_teachers(request):
     return JsonResponse(data, safe=False)
 
 def get_question(request, question_id):
-    # A variável 'quantidade_questoes' foi removida.
     # Agora filtramos por todas as questões que estão ativas.
     questoes_queryset = Questoes.objects.filter(ativo=True).prefetch_related('respostas_set').order_by('id')
     
-    # O restante da lógica para encontrar a questão pelo índice permanece o mesmo.
-    # O 'question_id' agora vai funcionar como um índice para a lista de questões ativas.
     question_index = question_id - 1
     
     try:
         questao_obj = questoes_queryset[question_index]
-        question_data = model_to_dict(questao_obj)
+        
+        # ALTERAÇÃO: Usamos 'exclude' para omitir o campo 'explicacao'
+        question_data = model_to_dict(questao_obj, exclude=['explicacao'])
 
         respostas_queryset = questao_obj.respostas_set.all()
         respostas_data = []
@@ -49,7 +47,6 @@ def get_question(request, question_id):
                 'id': r.id,
                 'resposta': r.resposta,
                 'questao': r.questao.id
-                # O campo 'correta' NÃO é incluído
             })
 
         question_data['respostas'] = respostas_data
@@ -57,7 +54,6 @@ def get_question(request, question_id):
         return JsonResponse(question_data)
 
     except IndexError:
-        # Se o índice for maior que o número de questões ativas, retorna erro.
         return JsonResponse({'error': f'Question number {question_id} not found among active questions.'}, status=404)
     
 @require_http_methods(["POST"])
@@ -65,32 +61,22 @@ def get_question(request, question_id):
 def check_answer(request):
     try:
         data = json.loads(request.body)
-        # O 'question_id' recebido do frontend é o índice (ex: 1, 2, 3...)
         question_index_id = data.get('question_id')
         answer_id = data.get('answer_id')
 
         if not question_index_id or not answer_id:
             return HttpResponseBadRequest("Faltando question_id ou answer_id")
 
-        # --- LÓGICA AJUSTADA ---
-        # 1. Buscamos o mesmo queryset da view get_question para garantir a consistência.
         questoes_queryset = Questoes.objects.filter(ativo=True).order_by('id')
-        
-        # 2. Convertemos o índice recebido (1, 2, 3...) para um índice de lista (0, 1, 2...).
         question_index = int(question_index_id) - 1
 
-        # Validação para evitar índices negativos
         if question_index < 0:
             return JsonResponse({'error': f'O número da questão ({question_index_id}) é inválido.'}, status=404)
         
-        # 3. Pegamos o objeto da questão real a partir do seu índice na lista.
         questao_obj = questoes_queryset[question_index]
         
-        # 4. AGORA SIM, usamos o ID real do objeto para checar a resposta.
         real_question_id = questao_obj.id
-        # --- FIM DO AJUSTE ---
 
-        # O restante da lógica permanece igual, mas agora usando o ID real que encontramos.
         selected_answer = Respostas.objects.get(id=answer_id, questao_id=real_question_id)
 
         correct_answer = Respostas.objects.get(questao_id=real_question_id, correta=True)
@@ -100,11 +86,11 @@ def check_answer(request):
         return JsonResponse({
             'is_correct': is_correct,
             'correct_answer_id': correct_answer.id,
-            'correct_answer_text': correct_answer.resposta
+            'correct_answer_text': correct_answer.resposta,
+            'explicacao': questao_obj.explicacao
         })
 
     except IndexError:
-        # Este erro ocorre se o question_index_id for maior que o número de questões ativas.
         return JsonResponse({'error': f'Questão número {question_index_id} não encontrada.'}, status=404)
     except Respostas.DoesNotExist:
         return JsonResponse({'error': 'Resposta ou Questão não encontrada.'}, status=404)

@@ -41,10 +41,10 @@ class Questoes(models.Model):
     ]
     
     questao = models.CharField(max_length=10)
-    titulo = models.CharField(max_length=255)
     texto = models.TextField()
     tipo = models.CharField(max_length=12, choices=TIPO_CHOICES, default=TIPO_UNICA,)
     nivel_dificuldade = models.IntegerField()
+    explicacao = models.CharField(max_length=512)
     microfone = models.BooleanField(default=False)
     criado_em = models.DateTimeField(blank=True, null=True)
     atualizado_em = models.DateTimeField(blank=True, null=True)

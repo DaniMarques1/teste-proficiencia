@@ -26,7 +26,7 @@ export function renderQuestionUI(question, container) {
             </div>
         `;
         container.innerHTML = questionHTML;
-        
+
     } else if (question.tipo === 'unica') {
         questionHTML = `
             <div class="card">
@@ -40,6 +40,7 @@ export function renderQuestionUI(question, container) {
 
         const optionsContainer = document.createElement('div');
         optionsContainer.className = 'answer-options-container';
+
         question.respostas.forEach(resposta => {
             const button = document.createElement('button');
             button.className = 'answer-option';
@@ -51,9 +52,34 @@ export function renderQuestionUI(question, container) {
             });
             optionsContainer.appendChild(button);
         });
+
         container.appendChild(optionsContainer);
     }
+
+    // === Lógica de leitura de texto ===
+    const speakButtons = container.querySelectorAll('.speak-button');
+    speakButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Pega o texto da questão
+            const questionText = container.querySelector('.text-to-speak')?.textContent || '';
+
+            // Pega as opções (caso existam)
+            const options = Array.from(container.querySelectorAll('.answer-option'))
+                .map(btn => btn.textContent)
+                .join(', ');
+
+            // Combina questão + respostas
+            const fullText = options ? `${questionText}. Opções: ${options}.` : questionText;
+
+            // Cancela qualquer leitura anterior e fala o novo texto
+            speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(fullText);
+            utterance.lang = 'pt-BR'; 
+            speechSynthesis.speak(utterance);
+        });
+    });
 }
+
 
 // ui.js
 
@@ -134,7 +160,6 @@ export function displayFeedbackScreen(resultados, teachers, titleElement, contai
     container.innerHTML = feedbackHTML;
 }
 
-
 /**
  * Exibe a tela de finalização do quiz com os resultados.
  * @param {Array} resultados - O array com os resultados de cada questão.
@@ -162,10 +187,12 @@ export function displayQuizFinished(resultados, titleElement, container) {
     if (correctAnswers.length > 0) {
         resultsHTML += '<div class="detailed-results"> <h3>Right Answers:</h3><ul class="results-list correct-list">';
         correctAnswers.forEach(res => {
+            // Adicionamos um parágrafo para a explicação se ela existir
             resultsHTML += `
                 <li>
                     <p><strong>Question:</strong> ${res.question}</p>
                     <p><strong>Your answer:</strong> <span class="correct-answer">${res.userAnswer || 'No answer'}</span></p>
+                    ${res.explicacao ? `<p><strong>Explanation:</strong> <span class="explanation-text">${res.explicacao}</span></p>` : ''}
                 </li>
             `;
         });
@@ -178,11 +205,13 @@ export function displayQuizFinished(resultados, titleElement, container) {
     if (incorrectAnswers.length > 0) {
         resultsHTML += '<div class="detailed-results"> <h3>Wrong answers:</h3><ul class="results-list incorrect-list">';
         incorrectAnswers.forEach(res => {
+            // Adicionamos também a explicação para as respostas incorretas
             resultsHTML += `
                 <li>
                     <p><strong>Question:</strong> ${res.question}</p>
                     <p><strong>Your answer:</strong> <span class="user-answer">${res.userAnswer || 'No answer'}</span></p>
                     <p><strong>Right answer:</strong> <span class="correct-answer">${res.correctAnswer}</span></p>
+                    ${res.explicacao ? `<p><strong>Explanation:</strong> <span class="explanation-text">${res.explicacao}</span></p>` : ''}
                 </li>
             `;
         });

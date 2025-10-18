@@ -3,6 +3,7 @@ import { renderQuestionUI, displayFeedbackScreen, displayQuizFinished, applyFade
 import { initializeAudioFeatures } from './audio.js';
 
 // --- ESTADO GLOBAL DO QUIZ ---
+let questionNumber = 1;
 let currentQuestionData = null;
 let currentQuestionId = 1;
 let resultados = [];
@@ -15,6 +16,7 @@ const feedbackContainer = document.getElementById('feedback-container');
 const questionTitleElement = document.getElementById('question-title');
 const cardsContainer = document.getElementById('cards-container');
 const nextButton = document.getElementById('next-button');
+const skipAuthButton = document.querySelector('.skip-auth-button');
 
 // --- ELEMENTOS DA TELA DE APRESENTAÇÃO ---
 const presentationContainer = document.getElementById('presentation-container');
@@ -26,7 +28,9 @@ async function loadQuestion() {
         const data = await fetchQuestion(currentQuestionId);
         currentQuestionData = data;
         
-        questionTitleElement.textContent = `${data.titulo}`;
+        // --- Linha modificada ---
+        questionTitleElement.textContent = `Questão ${questionNumber}`; 
+        
         renderQuestionUI(data, cardsContainer);
         initializeAudioFeatures();
         
@@ -34,6 +38,10 @@ async function loadQuestion() {
         if (textInput) {
             textInput.addEventListener('keyup', handleEnterKey);
         }
+
+        // Incrementa o número para a próxima questão
+        questionNumber++;
+
     } catch (error) {
         if (error.status === 404) {
             handleQuizEnd();
@@ -93,7 +101,7 @@ async function checkAnswer() {
     const selectedOption = document.querySelector('.answer-option.selected');
 
     if (currentQuestionData.tipo === 'unica' && !selectedOption) {
-        alert('Por favor, selecione uma resposta.');
+        alert('Please, choose an answer.');
         return; 
     }
 
@@ -117,7 +125,8 @@ async function checkAnswer() {
             question: currentQuestionData.texto,
             userAnswer: userAnswerText,
             correctAnswer: result.correct_answer_text, 
-            isCorrect: result.is_correct
+            isCorrect: result.is_correct,
+            explicacao: result.explicacao
         });
 
         loadNextQuestion();
@@ -206,6 +215,38 @@ userDataForm.addEventListener('submit', (event) => {
         console.error('Erro na requisição:', error);
         alert('Ocorreu um erro de comunicação com o servidor.');
     });
+});
+
+skipAuthButton.addEventListener('click', (event) => {
+    // Prevent the default button action (like form submission)
+    event.preventDefault();
+
+    // Get the container for the user data form
+    const userDataContainer = document.getElementById('user-data-container');
+
+    // Apply fade-out effect to the form container
+    applyFade(userDataContainer, 'out');
+    
+    // After the fade-out animation (300ms), switch the containers
+    setTimeout(() => {
+        // Hide the form container
+        userDataContainer.style.display = 'none';
+        
+        // Find the quiz container (assuming its ID is 'presentation-container' as in your original code)
+        const quizContainer = document.getElementById('presentation-container'); 
+        
+        if (quizContainer) {
+            // Show the quiz container and fade it in
+            quizContainer.style.display = 'block';
+            requestAnimationFrame(() => applyFade(quizContainer, 'in'));
+        } else {
+            console.error('Error: The quiz container was not found!');
+        }
+
+        // Start the quiz
+        iniciarQuiz(); 
+
+    }, 300); // This delay should match your fade-out transition time
 });
 
 function getCookie(name) {

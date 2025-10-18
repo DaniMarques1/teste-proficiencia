@@ -17,8 +17,8 @@ class ProfessoresAdmin(admin.ModelAdmin):
 
 @admin.register(Questoes)
 class QuestoesAdmin(admin.ModelAdmin):
-    list_display = ('id', 'titulo', 'texto', 'tipo', 'nivel_dificuldade', 'criado_em', 'ativo')
-    search_fields = ('titulo', 'texto', 'ativo')
+    list_display = ('id', 'texto', 'tipo', 'nivel_dificuldade', 'criado_em', 'ativo', 'explicacao')
+    search_fields = ('texto', 'ativo')
     list_filter = ('tipo', 'nivel_dificuldade', 'ativo')
     inlines = [RespostasInline]
     

@@ -378,7 +378,7 @@ body {
     box-sizing: border-box;
     text-align: center;
     transition: opacity 0.5s ease-out, transform 0.5s ease-out;
-    z-index: 2;
+    z-index: 3;
 }
 
 #user-data-container h2 {
