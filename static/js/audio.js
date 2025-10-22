@@ -36,7 +36,6 @@ export function initializeAudioFeatures() {
                                      .map(el => el.textContent.trim()) // Pega o texto de cada um
                                      .join('. '); // Junta com um ponto final para dar uma pausa natural
 
-            // --- FIM DA LÓGICA MODIFICADA ---
 
             if ('speechSynthesis' in window && textToSpeak) {
                 const utterance = new SpeechSynthesisUtterance(textToSpeak);
@@ -47,9 +46,6 @@ export function initializeAudioFeatures() {
             }
         });
     });
-
-    // 2. Speech-to-Text (Microfone) - Esta parte permanece igual
-    // ... o resto da sua função continua o mesmo ...
 }
 
 // Inicializa a API de reconhecimento de voz assim que o módulo é carregado.

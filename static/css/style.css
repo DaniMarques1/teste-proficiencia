@@ -735,11 +735,13 @@ body {
     }
 }
 
-/* Media Queries */
 @media (max-width: 768px) {
     .navbar-title {
-        font-size: 1.2em;
+        font-size: 1em;
     }
+    .navbar-logo img {
+            width: 100px;
+        }
 }
 
 @media (max-width: 900px) {

@@ -38,7 +38,6 @@ async function loadQuestion() {
         questionTitleElement.textContent = `Questão ${questionNumber}`; 
         
         renderQuestionUI(data, cardsContainer);
-        initializeAudioFeatures();
         
         const textInput = document.getElementById('translation-input');
         if (textInput) {
