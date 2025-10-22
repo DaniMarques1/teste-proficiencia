@@ -120,8 +120,8 @@ def salvar_usuario(request):
 
         # Tente enviar o e-mail
         try:
-            subject = 'Seu Código de Verificação'
-            message = f'Olá! Seu código de verificação é: {codigo}\nEste código expira em 10 minutos.'
+            subject = 'Your verification code.'
+            message = f'Hi! Your verification code is: {codigo}\nThis code expires within 10 minutes.'
             from_email = settings.EMAIL_HOST_USER # Configurado no settings.py
 
             send_mail(subject, message, from_email, [email_para])
@@ -207,5 +207,5 @@ def verificar_e_salvar(request):
         # Código incorreto
         return JsonResponse({
             'status': 'error',
-            'message': 'Código de verificação inválido.'
+            'message': 'Invalid verification code.'
         }, status=400)
