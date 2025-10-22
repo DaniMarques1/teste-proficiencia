@@ -10,6 +10,10 @@ from django.utils import timezone
 from contas.forms import UsuarioForm
 from django.views.decorators.csrf import ensure_csrf_cookie
 import json
+from django.core.mail import send_mail
+import random
+from django.conf import settings
+import time
 
 def get_teacher(request, teacher_id):
     teacher_index = teacher_id - 1
@@ -104,21 +108,104 @@ def index_view(request):
 @ensure_csrf_cookie
 def salvar_usuario(request):
     """
-    Recebe os dados via POST, valida com o UsuarioForm e salva no banco.
+    Passo 1: Recebe os dados, valida, GERA um código,
+    ENVIA por e-mail e SALVA na sessão (NÃO no banco).
     """
     form = UsuarioForm(request.POST)
 
     if form.is_valid():
-        novo_usuario = form.save(commit=False)
-        novo_usuario.criado_em = timezone.now()
-        novo_usuario.save() # Agora salva no banco
+        # Gere um código aleatório de 6 dígitos
+        codigo = "{:06d}".format(random.randint(0, 999999))
+        email_para = form.cleaned_data.get('email')
 
+        # Tente enviar o e-mail
+        try:
+            subject = 'Seu Código de Verificação'
+            message = f'Olá! Seu código de verificação é: {codigo}\nEste código expira em 10 minutos.'
+            from_email = settings.EMAIL_HOST_USER # Configurado no settings.py
+
+            send_mail(subject, message, from_email, [email_para])
+
+        except Exception as e:
+            # TODO: Logar o erro 'e' para depuração
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Falha ao enviar o e-mail de verificação. Tente novamente.'
+            }, status=500)
+
+        # Salve os dados na sessão, não no banco
+        request.session['verification_code'] = codigo
+        request.session['registration_data'] = form.cleaned_data # Salva os dados do form
+        request.session.set_expiry(600) # Código expira em 10 minutos (600 segundos)
+
+        # Avise o front-end que o código foi enviado
         return JsonResponse({
-            'status': 'success',
-            'message': 'Cadastro realizado com sucesso!'
+            'status': 'code_sent',
+            'message': 'Enviamos um código de 6 dígitos para o seu e-mail.'
         })
     else:
+        # Erros de formulário (ex: e-mail inválido, já existe, etc.)
         return JsonResponse({
             'status': 'error',
             'errors': form.errors.get_json_data()
-        }, status=400) 
+        }, status=400)
+
+
+@require_http_methods(["POST"])
+@ensure_csrf_cookie
+def verificar_e_salvar(request):
+    """
+    Passo 2: Recebe o código de verificação. Se for válido,
+    recupera os dados da sessão e cria o usuário no banco.
+    """
+    try:
+        # Assumindo que o front-end envia: {'code': '123456'}
+        data = json.loads(request.body)
+        user_code = data.get('code')
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Requisição mal formatada.'}, status=400)
+
+    # Obtenha os dados da sessão
+    session_code = request.session.get('verification_code')
+    reg_data = request.session.get('registration_data')
+
+    # Verifique se a sessão não expirou
+    if not session_code or not reg_data:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Sua sessão expirou. Por favor, envie seus dados novamente.'
+        }, status=400)
+
+    if user_code == session_code:
+        # SUCESSO! O código bateu.
+        # Vamos recriar o formulário com os dados da sessão
+        form = UsuarioForm(reg_data)
+
+        # Rodamos form.is_valid() DE NOVO.
+        # Isso é uma checagem de segurança importante (race condition)
+        # para garantir que ninguém pegou o e-mail nesse meio tempo.
+        if form.is_valid():
+            novo_usuario = form.save(commit=False)
+            novo_usuario.criado_em = timezone.now()
+            novo_usuario.save() # Agora sim, salvamos no banco!
+
+            # Limpe a sessão para não ser usada de novo
+            del request.session['verification_code']
+            del request.session['registration_data']
+
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Cadastro realizado com sucesso!'
+            })
+        else:
+            # Raro: Ocorreu um erro (ex: e-mail pego por outro)
+            return JsonResponse({
+                'status': 'error',
+                'errors': form.errors.get_json_data()
+            }, status=400)
+    else:
+        # Código incorreto
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Código de verificação inválido.'
+        }, status=400)

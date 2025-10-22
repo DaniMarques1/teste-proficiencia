@@ -22,320 +22,389 @@ const skipAuthButton = document.querySelector('.skip-auth-button');
 const presentationContainer = document.getElementById('presentation-container');
 const startQuizButton = document.getElementById('start-quiz-button');
 
+const codeVerificationContainer = document.getElementById('code-verification-container');
+const codeVerificationForm = document.getElementById('code-verification-form');
+const codeInput = document.getElementById('code-input');
+const codeErrorMessage = document.getElementById('code-error-message');
+
 // --- FUNÇÕES DE CONTROLE DO QUIZ ---
 async function loadQuestion() {
-    try {
-        const data = await fetchQuestion(currentQuestionId);
-        currentQuestionData = data;
-        
-        // --- Linha modificada ---
-        questionTitleElement.textContent = `Questão ${questionNumber}`; 
-        
-        renderQuestionUI(data, cardsContainer);
-        initializeAudioFeatures();
-        
-        const textInput = document.getElementById('translation-input');
-        if (textInput) {
-            textInput.addEventListener('keyup', handleEnterKey);
-        }
+    // ... (Esta função permanece igual)
+    try {
+        const data = await fetchQuestion(currentQuestionId);
+        currentQuestionData = data;
+        
+        // --- Linha modificada ---
+        questionTitleElement.textContent = `Questão ${questionNumber}`; 
+        
+        renderQuestionUI(data, cardsContainer);
+        initializeAudioFeatures();
+        
+        const textInput = document.getElementById('translation-input');
+        if (textInput) {
+            textInput.addEventListener('keyup', handleEnterKey);
+        }
 
-        // Incrementa o número para a próxima questão
-        questionNumber++;
+        // Incrementa o número para a próxima questão
+        questionNumber++;
 
-    } catch (error) {
-        if (error.status === 404) {
-            handleQuizEnd();
-        } else {
-            console.error('Error loading question:', error);
-            questionTitleElement.textContent = 'Error loading question';
-        }
-    }
+    } catch (error) {
+        if (error.status === 404) {
+            handleQuizEnd();
+        } else {
+            console.error('Error loading question:', error);
+            questionTitleElement.textContent = 'Error loading question';
+        }
+    }
 }
 
 async function handleQuizEnd() {
-    applyFade(quizContainer, 'out');
-    nextButton.style.display = 'none';
+    applyFade(quizContainer, 'out');
+    nextButton.style.display = 'none';
 
-    try {
-        // 1️⃣ Primeiro envia resultados para o backend (gera relatório e recebe pontos fortes/fracos)
-        const reportData = await sendResultsToBackend(); // <- chamada principal
+    // 1️⃣ Mostra o loader assim que o quiz desaparecer
+    setTimeout(() => {
+        quizContainer.style.display = 'none';
+        feedbackContainer.style.display = 'block';
 
-        // 2️⃣ Depois busca professores normalmente
-        const teachers = await fetchTeachers();
+        // Define o HTML do loader
+        feedbackContainer.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; text-align: center;">
+                <div class="spinner"></div> 
+                <p style="font-size: 1.2rem; margin-top: 20px;">Loading results...</p>
+            </div>
+        `;
+        
+        requestAnimationFrame(() => applyFade(feedbackContainer, 'in'));
+    }, 300); // 300ms = tempo do seu fade-out
 
-        // 3️⃣ Exibe o feedback com base nas respostas do backend
-        setTimeout(() => {
-            quizContainer.style.display = 'none';
-            feedbackContainer.style.display = 'block';
+    try {
+        const reportData = await sendResultsToBackend(); // <- Chamada principal
+        const teachers = await fetchTeachers();
 
-            // Renderiza o feedback com os dados da IA (pontos fortes e fracos)
-            displayFeedbackScreen(
-                resultados,
-                teachers,
-                questionTitleElement,
-                feedbackContainer,
-                reportData?.pontos_fortes || [],
-                reportData?.pontos_a_desenvolver || []
-            );
+        displayFeedbackScreen(
+            resultados,
+            teachers,
+            questionTitleElement,
+            feedbackContainer,
+            reportData?.pontos_fortes || [],
+            reportData?.pontos_a_desenvolver || []
+        );
 
-            requestAnimationFrame(() => applyFade(feedbackContainer, 'in'));
+        // 4️⃣ Re-adiciona os event listeners aos novos botões
+        const emailButton = document.getElementById('get-results-button');
+        const showDetailsButton = document.getElementById('show-details-button');
 
-            const emailButton = document.getElementById('get-results-button');
-            const showDetailsButton = document.getElementById('show-details-button');
+        if (emailButton) {
+            emailButton.addEventListener('click', () => {
+                alert('Funcionalidade de envio de email a ser implementada!');
+            });
+        }
 
-            if (emailButton) {
-                emailButton.addEventListener('click', () => {
-                    alert('Funcionalidade de envio de email a ser implementada!');
-                });
-            }
+        if (showDetailsButton) {
+            showDetailsButton.addEventListener('click', () => {
+                applyFade(feedbackContainer, 'out');
+                setTimeout(() => {
+                    displayQuizFinished(resultados, questionTitleElement, feedbackContainer);
+                    requestAnimationFrame(() => applyFade(feedbackContainer, 'in'));
+                }, 300);
+            });
+        }
 
-            if (showDetailsButton) {
-                showDetailsButton.addEventListener('click', () => {
-                    applyFade(feedbackContainer, 'out');
-                    setTimeout(() => {
-                        displayQuizFinished(resultados, questionTitleElement, feedbackContainer);
-                        requestAnimationFrame(() => applyFade(feedbackContainer, 'in'));
-                    }, 300);
-                });
-            }
-
-        }, 300);
-
-    } catch (error) {
-        console.error("Erro ao finalizar quiz:", error);
-        questionTitleElement.textContent = 'Erro ao carregar resultados';
-        feedbackContainer.innerHTML = `<p>Não foi possível carregar as recomendações. Tente novamente mais tarde.</p>`;
-        feedbackContainer.style.display = 'block';
-    }
+    } catch (error) {
+        // 5️⃣ Em caso de erro, substitui o loader pela mensagem de erro
+        console.error("Erro ao finalizar quiz:", error);
+        questionTitleElement.textContent = 'Erro ao carregar resultados';
+        feedbackContainer.innerHTML = `<p>Não foi possível carregar as recomendações. Tente novamente mais tarde.</p>`;
+    }
 }
-
 
 async function checkAnswer() {
-    if (!currentQuestionData) return;
+    if (!currentQuestionData) return;
 
-    const selectedOption = document.querySelector('.answer-option.selected');
+    const selectedOption = document.querySelector('.answer-option.selected');
 
-    if (currentQuestionData.tipo === 'unica' && !selectedOption) {
-        alert('Please, choose an answer.');
-        return; 
-    }
+    if (currentQuestionData.tipo === 'unica' && !selectedOption) {
+        alert('Please, choose an answer.');
+        return; 
+    }
 
-    let userAnswerId;
-    let userAnswerText;
+    let userAnswerId;
+    let userAnswerText;
 
-    if (currentQuestionData.tipo === 'unica') {
-        userAnswerId = parseInt(selectedOption.dataset.id);
-        userAnswerText = selectedOption.textContent;
-    } else {
-        console.log("Tipo de pergunta não suportado pela verificação de backend ainda.");
-        return;
-    }
+    if (currentQuestionData.tipo === 'unica') {
+        userAnswerId = parseInt(selectedOption.dataset.id);
+        userAnswerText = selectedOption.textContent;
+    } else {
+        console.log("Tipo de pergunta não suportado pela verificação de backend ainda.");
+        return;
+    }
 
-    try {
-        const csrftoken = getCookie('csrftoken'); 
+    try {
+        const csrftoken = getCookie('csrftoken'); 
 
-        const result = await checkAnswerAPI(currentQuestionId, userAnswerId, csrftoken);
+        const result = await checkAnswerAPI(currentQuestionId, userAnswerId, csrftoken);
 
-        resultados.push({
-            question: currentQuestionData.texto,
-            userAnswer: userAnswerText,
-            correctAnswer: result.correct_answer_text, 
-            isCorrect: result.is_correct,
-            explicacao: result.explicacao
-        });
+        resultados.push({
+            question: currentQuestionData.texto,
+            userAnswer: userAnswerText,
+            correctAnswer: result.correct_answer_text, 
+            isCorrect: result.is_correct,
+            explicacao: result.explicacao
+        });
 
-        loadNextQuestion();
+        loadNextQuestion();
 
-    } catch (error) {
-        console.error('Erro ao verificar a resposta:', error);
-        alert('Não foi possível verificar sua resposta. Tente novamente.');
-    }
+    } catch (error) {
+        console.error('Erro ao verificar a resposta:', error);
+        alert('Não foi possível verificar sua resposta. Tente novamente.');
+    }
 }
 
-
 async function sendResultsToBackend() {
-    const csrftoken = getCookie('csrftoken');
+    const csrftoken = getCookie('csrftoken');
 
-    // Mapeia os resultados para o formato esperado pelo prompt da IA
-    const respostas = resultados.map(r =>
-        `Question: ${r.question} | Your answer: ${r.userAnswer} | Correct answer: ${r.correctAnswer}`
-    );
+    const respostas = resultados.map(r =>
+        `Question: ${r.question} | Your answer: ${r.userAnswer} | Correct answer: ${r.correctAnswer}`
+    );
 
-    // ✅ (Sugestão) Calcule a nota dinamicamente
-    const acertos = resultados.filter(r => r.isCorrect).length;
-    const nota_final = Math.round((acertos / resultados.length) * 100); // Ex: nota de 0 a 100
+    const acertos = resultados.filter(r => r.isCorrect).length;
+    const nota_final = Math.round((acertos / resultados.length) * 100); 
 
-    const payload = {
-        // ✅ (Sugestão) Pegue o nome do usuário do formulário inicial, se disponível
-        nome_aluno: document.getElementById('nome')?.value || "Aluno",
-        respostas: respostas,
-        nivel: "A1 Intermediário", // Pode ser determinado dinamicamente também
-        nota_final: nota_final,
-        pdf: true // <-- Essencial para receber o JSON de volta
-    };
+    // 1. Capture os valores dos inputs de nome e e-mail
+    const nome_aluno = document.getElementById('user-name')?.value || "Aluno";
+    const email_aluno = document.getElementById('user-email')?.value || null; // Use null se estiver vazio
 
-    try {
-        const response = await fetch("/gerar-relatorio/", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": csrftoken
-            },
-            body: JSON.stringify(payload)
-        });
+    const payload = {
+        nome_aluno: nome_aluno,
+        email_destinatario: email_aluno, 
+        respostas: respostas,
+        nivel: "A1 Intermediário", 
+        nota_final: nota_final,
+        pdf: true 
+    };
 
-        // O response.json() agora vai funcionar, pois a view retornará JSON
-        const data = await response.json();
+    try {
+        const response = await fetch("/gerar-relatorio/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrftoken
+            },
+            body: JSON.stringify(payload)
+        });
 
-        if (response.ok) {
-            console.log("✅ Análise da IA recebida com sucesso:", data);
-            return data; // <-- Retorna o JSON {pontos_fortes, pontos_a_desenvolver}
-        } else {
-            alert("Erro ao gerar feedback: " + (data.erro || "Erro desconhecido"));
-            return null;
-        }
-    } catch (error) {
-        console.error("Erro ao enviar resultados:", error);
-        return null;
-    }
+        const data = await response.json();
+
+        if (response.ok) {
+            console.log("✅ Análise da IA recebida com sucesso:", data);
+            return data; 
+        } else {
+            alert("Erro ao gerar feedback: " + (data.erro || "Erro desconhecido"));
+            return null;
+        }
+    } catch (error) {
+        console.error("Erro ao enviar resultados:", error);
+        return null;
+    }
 }
 
 
 function loadNextQuestion() {
-    applyFade(cardsContainer, 'out');
+    applyFade(cardsContainer, 'out');
 
-    setTimeout(() => {
-        currentQuestionId++;
-        loadQuestion().then(() => {
-            applyFade(cardsContainer, 'in');
-        });
-    }, 300);
+    setTimeout(() => {
+        currentQuestionId++;
+        loadQuestion().then(() => {
+            applyFade(cardsContainer, 'in');
+        });
+    }, 300);
 }
 
 function handleEnterKey(event) {
-    if (event.key === 'Enter') {
-        event.preventDefault();
-        nextButton.click();
-    }
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        nextButton.click();
+    }
+}
+
+function iniciarQuiz() {
+    console.log("Iniciando o Quiz (preparando tela de apresentação)...");
 }
 
 // --- INICIALIZAÇÃO E EVENTOS ---
 
 nextButton.addEventListener('click', checkAnswer);
 
-// Evento do formulário de dados do usuário
-const csrftoken = getCookie('csrftoken'); // Pega o token na inicialização
+const csrftoken = getCookie('csrftoken'); 
 
 userDataForm.addEventListener('submit', (event) => {
     event.preventDefault();
     const formData = new FormData(userDataForm);
-
     document.querySelectorAll('.error-message').forEach(el => el.remove());
+
+    // --- 1️⃣ Começa o fade imediatamente ---
+    applyFade(userDataContainer, 'out');
+    
+    setTimeout(() => {
+        userDataContainer.style.display = 'none';
+
+        if (codeVerificationContainer) {
+            codeVerificationContainer.style.display = 'block';
+            requestAnimationFrame(() => applyFade(codeVerificationContainer, 'in'));
+            codeInput.focus();
+        } else {
+            console.error('Erro: O container de verificação de código não foi encontrado!');
+        }
+    }, 300);
+
+    // --- 2️⃣ Executa o fetch em paralelo ---
+    const csrftoken = getCookie('csrftoken');
 
     fetch('/api/salvar-usuario/', {
         method: 'POST',
         body: formData,
-        headers: {
-            'X-CSRFToken': csrftoken 
-        }
+        headers: { 'X-CSRFToken': csrftoken }
     })
     .then(response => response.json())
     .then(data => {
-        if (data.status === 'success') {
-
-            applyFade(userDataContainer, 'out');
-            
-            setTimeout(() => {
-                userDataContainer.style.display = 'none';
-                const quizContainer = document.getElementById('presentation-container'); 
-                
-                if (quizContainer) {
-                    quizContainer.style.display = 'block';
-                    requestAnimationFrame(() => applyFade(quizContainer, 'in'));
-                } else {
-                    console.error('Erro: O container do quiz não foi encontrado!');
-                }
-
-                iniciarQuiz(); 
-
-            }, 300); 
-
-
+        if (data.status === 'code_sent') {
+            console.log("Código enviado com sucesso.");
         } else if (data.status === 'error') {
-            let errorMessages = [];
-            for (const field in data.errors) {
-                const errorList = data.errors[field];
-                if (errorList.length > 0) {
-                    const message = errorList[0].message; 
-                    errorMessages.push(`- ${field}: ${message}`);
-                }
-            }
-            if (errorMessages.length > 0) {
-                alert(errorMessages.join('\n'));
-            }
+            // --- 3️⃣ Em caso de erro, volta para o formulário ---
+            revertToUserFormWithErrors(data.errors);
         }
     })
     .catch(error => {
         console.error('Erro na requisição:', error);
         alert('Ocorreu um erro de comunicação com o servidor.');
+        revertToUserFormWithErrors(); // volta para o form
     });
 });
 
-skipAuthButton.addEventListener('click', (event) => {
-    // Prevent the default button action (like form submission)
-    event.preventDefault();
-
-    // Get the container for the user data form
-    const userDataContainer = document.getElementById('user-data-container');
-
-    // Apply fade-out effect to the form container
-    applyFade(userDataContainer, 'out');
-    
-    // After the fade-out animation (300ms), switch the containers
+// Função auxiliar para voltar ao form se der erro
+function revertToUserFormWithErrors(errors = {}) {
+    applyFade(codeVerificationContainer, 'out');
     setTimeout(() => {
-        // Hide the form container
-        userDataContainer.style.display = 'none';
-        
-        // Find the quiz container (assuming its ID is 'presentation-container' as in your original code)
-        const quizContainer = document.getElementById('presentation-container'); 
-        
-        if (quizContainer) {
-            // Show the quiz container and fade it in
-            quizContainer.style.display = 'block';
-            requestAnimationFrame(() => applyFade(quizContainer, 'in'));
-        } else {
-            console.error('Error: The quiz container was not found!');
+        codeVerificationContainer.style.display = 'none';
+        userDataContainer.style.display = 'block';
+        requestAnimationFrame(() => applyFade(userDataContainer, 'in'));
+
+        // Se tiver erros de validação, exibe
+        for (const field in errors) {
+            const errorList = errors[field];
+            if (errorList && errorList.length > 0) {
+                const message = errorList[0].message;
+                const inputField = userDataForm.querySelector(`[name="${field}"]`);
+                if (inputField) {
+                    const errorEl = document.createElement('div');
+                    errorEl.className = 'error-message';
+                    errorEl.textContent = message;
+                    errorEl.style.color = 'red';
+                    errorEl.style.fontSize = '0.9rem';
+                    inputField.parentElement.appendChild(errorEl);
+                }
+            }
+        }
+    }, 300);
+}
+
+
+if (codeVerificationForm) {
+    codeVerificationForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const code = codeInput.value;
+        codeErrorMessage.textContent = ''; // Limpa erros antigos
+
+        if (!code || code.length < 6) {
+            codeErrorMessage.textContent = 'Please, input the 6-digit code.';
+            return;
         }
 
-        // Start the quiz
-        iniciarQuiz(); 
+    fetch('/api/verificar-codigo/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken
+        },
+        body: JSON.stringify({ code: code })
+    })
+    .then(async response => {
+        const data = await response.json().catch(() => ({})); // evita erro se não for JSON
+        if (!response.ok) {
+            // Se o backend retornou 400, ainda tratamos o conteúdo
+            throw data;
+        }
+        return data;
+    })
+    .then(data => {
+        if (data.status === 'success') {
+            // Código correto
+            applyFade(codeVerificationContainer, 'out');
+            setTimeout(() => {
+                codeVerificationContainer.style.display = 'none';
+                const presentation = document.getElementById('presentation-container');
+                if (presentation) {
+                    presentation.style.display = 'block';
+                    requestAnimationFrame(() => applyFade(presentation, 'in'));
+                }
+                iniciarQuiz();
+            }, 300);
+        } else {
+            // Mesmo se vier status=success mas algo estranho
+            codeErrorMessage.textContent = data.message || 'Ocorreu um erro.';
+        }
+    })
+    .catch(error => {
+        console.error('Erro na verificação:', error);
+        codeErrorMessage.textContent = error.message || 'Código inválido ou sessão expirada.';
+        codeInput.focus();
+        codeInput.select();
+    });
+    });
+}
 
-    }, 300); // This delay should match your fade-out transition time
+
+skipAuthButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    const userDataContainer = document.getElementById('user-data-container');
+    applyFade(userDataContainer, 'out');
+    
+    setTimeout(() => {
+        userDataContainer.style.display = 'none';
+        const quizContainer = document.getElementById('presentation-container'); 
+        
+        if (quizContainer) {
+            quizContainer.style.display = 'block';
+            requestAnimationFrame(() => applyFade(quizContainer, 'in'));
+        } else {
+            console.error('Error: The quiz container was not found!');
+        }
+        iniciarQuiz(); 
+    }, 300); 
 });
 
 function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
 }
 
-// Evento do botão 'Start Quiz' da tela de apresentação
 startQuizButton.addEventListener('click', () => {
-    applyFade(presentationContainer, 'out');
-    setTimeout(() => {
-        presentationContainer.style.display = 'none';
-        quizContainer.style.display = 'block';
-        requestAnimationFrame(() => applyFade(quizContainer, 'in'));
-        loadQuestion();
-    }, 300);
+    applyFade(presentationContainer, 'out');
+    setTimeout(() => {
+        presentationContainer.style.display = 'none';
+        quizContainer.style.display = 'block';
+        requestAnimationFrame(() => applyFade(quizContainer, 'in'));
+        loadQuestion();
+    }, 300);
 });

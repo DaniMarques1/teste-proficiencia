@@ -5,7 +5,7 @@
  * @returns {Promise<Array<number>>} Uma promessa que resolve para um array de IDs.
  */
 export async function fetchQuestionList() {
-    const response = await fetch(`/questions/`); // Novo endpoint
+    const response = await fetch(`api/questions/`); // Novo endpoint
     
     if (!response.ok) {
         const error = new Error('Falha ao buscar a lista de questões');
@@ -22,7 +22,7 @@ export async function fetchQuestionList() {
  * @returns {Promise<Object>} Os dados da questão.
  */
 export async function fetchQuestion(questionId) {
-    const response = await fetch(`/question/${questionId}`);
+    const response = await fetch(`api/question/${questionId}`);
     
     if (!response.ok) {
         const error = new Error('Falha ao buscar a questão');
@@ -68,7 +68,7 @@ export async function checkAnswerAPI(questionId, answerId, csrftoken) {
  * @returns {Promise<Object>} Os dados do professor.
  */
 export async function fetchTeacher(teacherId) {
-    const response = await fetch(`/teacher/${teacherId}`);
+    const response = await fetch(`api/teacher/${teacherId}`);
 
     if (!response.ok) {
         const error = new Error('Falha ao buscar o professor');
@@ -84,7 +84,7 @@ export async function fetchTeacher(teacherId) {
  */
 export async function fetchTeachers() {
     // Note o endpoint no plural: 'teachers'
-    const response = await fetch(`/teachers/`); 
+    const response = await fetch(`api/teachers/`); 
 
     if (!response.ok) {
         const error = new Error('Falha ao buscar a lista de professores');

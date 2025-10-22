@@ -2,20 +2,21 @@ import os
 import json
 import datetime
 import time
-from django.http import JsonResponse, HttpResponse
+import io  # Para manipulação de bytes em memória
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.core.mail import EmailMessage  # Para enviar e-mail com anexo
 from jinja2 import Environment, FileSystemLoader
 from weasyprint import HTML
 from dotenv import load_dotenv
 import openai
 
-# Carregar variáveis de ambiente
 load_dotenv()
 
-# Credenciais
 OPENAI_KEY = os.getenv('OPENAI_KEY')
 openai.api_key = OPENAI_KEY
 
+EMAIL_PADRAO_RELATORIO = None
 
 def avaliacao_modelo__gpt(history):
     """Envia o histórico para o modelo e retorna a resposta como string."""
@@ -31,7 +32,8 @@ def gerar_relatorio(request):
     """
     View principal: gera um relatório com avaliação automática.
     Sempre retorna um JSON com a análise da IA.
-    Se solicitado, também salva um PDF completo no servidor.
+    Se solicitado, gera um PDF em memória e o envia por e-mail
+    para o destinatário fornecido ou para um e-mail padrão.
     """
     if request.method != "POST":
         return JsonResponse({"erro": "Método não permitido. Use POST."}, status=405)
@@ -46,6 +48,9 @@ def gerar_relatorio(request):
         nivel = data.get("nivel", "Não especificado")
         nota_final = data.get("nota_final", 0)
         quer_pdf = data.get("pdf", False)
+        
+        # Obter o e-mail (pode ser None)
+        email_destinatario = data.get("email_destinatario", None)
 
         if not respostas:
             return JsonResponse({"erro": "Nenhuma resposta fornecida para análise."}, status=400)
@@ -94,9 +99,19 @@ def gerar_relatorio(request):
                         "pontos_a_desenvolver": ["Falha ao analisar a resposta da API."]
                     }
 
-        # 4. Se a geração de PDF foi solicitada, crie e salve o arquivo
-        #    Esta lógica agora é executada ANTES de enviar a resposta final.
+        # 4. Se a geração de PDF (e envio de e-mail) foi solicitada
         if quer_pdf:
+            
+            email_para_envio = email_destinatario
+            aviso_json = ""
+            
+            if not email_destinatario:
+                # Se nenhum e-mail foi fornecido no payload, usa o e-mail padrão
+                email_para_envio = EMAIL_PADRAO_RELATORIO
+                aviso_json = f"Nenhum destinatário fornecido. E-mail enviado para o endereço padrão."
+                print(aviso_json) # Log no servidor
+            
+
             script_dir = os.path.dirname(os.path.abspath(__file__))
             
             # Contexto completo para o template do PDF
@@ -108,23 +123,53 @@ def gerar_relatorio(request):
                 "data_emissao": datetime.date.today().strftime('%d de %B de %Y')
             }
 
+            # Renderiza o HTML
             env = Environment(loader=FileSystemLoader(script_dir))
             template = env.get_template('template.html')
             html_final = template.render(dados_template)
             
-            # ✅ GERA UM NOME DE ARQUIVO ÚNICO PARA NÃO SOBRESCREVER
+            # Gera um nome de arquivo único para o anexo
             timestamp = int(time.time())
             nome_arquivo_pdf = f'relatorio_{nome_aluno.replace(" ", "_")}_{timestamp}.pdf'
 
-            # Considere criar um diretório 'temp_reports' para organizar os PDFs
-            # Ex: pdf_path = os.path.join(script_dir, 'temp_reports', nome_arquivo_pdf)
-            pdf_path = os.path.join(script_dir, nome_arquivo_pdf)
-
-            # Salva o PDF no caminho especificado
-            HTML(string=html_final, base_url=script_dir).write_pdf(pdf_path, presentational_hints=True)
+            # --- GERAÇÃO DO PDF EM MEMÓRIA ---
             
-            # Adicionamos uma informação extra no JSON para o frontend saber que o PDF foi gerado
-            resposta_final["pdf_gerado"] = nome_arquivo_pdf
+            pdf_buffer = io.BytesIO()
+            HTML(string=html_final, base_url=script_dir).write_pdf(
+                pdf_buffer,
+                presentational_hints=True
+            )
+            pdf_bytes = pdf_buffer.getvalue()
+            pdf_buffer.close()
+
+            # --- ENVIO DO E-MAIL COM O PDF EM MEMÓRIA ---
+            try:
+                email_remetente = os.getenv('EMAIL_HOST_USER') 
+                
+                email = EmailMessage(
+                    subject="Congratulations on completing your Portuguese quiz! 🎉",
+                    body=f"Hi, {nome_aluno}!\n\nCongratulations on completing your Portuguese quiz!\n\nAttached, you’ll find a summary of your results — great work! \n\nReady to keep improving? Schedule your next Portuguese lesson at bestwayportuguese.com and continue your learning journey with us. \n\n \n\nSee you soon, \n\nThe Best Way Portuguese Team",
+                    from_email=email_remetente,
+                    to=[email_para_envio] 
+                )
+                
+                email.attach(
+                    nome_arquivo_pdf,
+                    pdf_bytes,
+                    'application/pdf'
+                )
+                
+                email.send()
+                
+                # Adiciona feedback de sucesso no JSON
+                resposta_final["email_enviado"] = email_para_envio
+                if aviso_json:
+                    resposta_final["aviso_envio"] = aviso_json
+
+            except Exception as e:
+                print(f"Erro ao enviar e-mail: {e}")
+                # Adiciona feedback de erro no JSON
+                resposta_final["erro_email"] = f"A análise foi gerada, mas falhou ao enviar o e-mail: {str(e)}"
 
         # 5. Retorne SEMPRE a resposta JSON para o frontend
         return JsonResponse(resposta_final, status=200)
@@ -132,6 +177,5 @@ def gerar_relatorio(request):
     except json.JSONDecodeError:
         return JsonResponse({"erro": "Payload JSON inválido."}, status=400)
     except Exception as e:
-        # Para depuração, é bom logar o erro real
-        print(f"Erro inesperado: {e}")
+        print(f"Erro inesperado na view: {e}")
         return JsonResponse({"erro": "Ocorreu um erro interno no servidor."}, status=500)

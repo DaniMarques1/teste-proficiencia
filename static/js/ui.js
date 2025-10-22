@@ -80,9 +80,6 @@ export function renderQuestionUI(question, container) {
     });
 }
 
-
-// ui.js
-
 /**
  * Exibe a tela de feedback do quiz com um resumo e sugestões de professores.
  * @param {Array} resultados - O array com os resultados de cada questão.
@@ -90,7 +87,7 @@ export function renderQuestionUI(question, container) {
  * @param {HTMLElement} titleElement - O elemento do título principal.
  * @param {HTMLElement} container - O elemento onde o feedback será renderizado.
  */
-// 1. Adicione 'teachers' como um novo parâmetro
+
 export function displayFeedbackScreen(
     resultados,
     teachers,
@@ -149,7 +146,6 @@ export function displayFeedbackScreen(
                 </div>
                 
                 <div class="feedback-actions">
-                    <button class="feedback-button email-button" id="get-results-button">Get Results by Email</button>
                     <button class="feedback-button" id="show-details-button">See Responses</button>
                 </div>
 
@@ -158,7 +154,7 @@ export function displayFeedbackScreen(
             <div class="feedback-teachers-panel">
                 <div class="congratulations-section">
                     <h3>Congratulations!</h3>
-                    <p>Thank you for participating in the quiz! If you're looking to improve your Portuguese, connect with a teacher on our platform:</p>
+                    <p>Thank you for participating in the quiz! Your results was sent to your e-mail inbox. If you're looking to improve your Portuguese, connect with a teacher on our platform:</p>
                 </div>
                 ${teachersHTML}
             </div>
@@ -188,7 +184,6 @@ export function displayQuizFinished(resultados, titleElement, container) {
                 <p class="score-incorrect"><strong>Wrong:</strong> ${erros}</p>
             </div>
         </div>
-        <div style="text-align: center; padding: 10px;"> <button class="feedback-button email-button" id="get-results-button">Get Results by Email</button> </div>
     `;
     
     const correctAnswers = resultados.filter(r => r.isCorrect);

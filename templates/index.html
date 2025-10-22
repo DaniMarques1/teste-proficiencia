@@ -36,7 +36,7 @@
             <img src="{% static 'img/logo.svg' %}" alt="Portuguese Best Way Logo">
         </div>
         <div class="info-box">
-            <h2>At BestWayPortuguese, we offer one-on-one classes that are 100% focused on you:</h2>
+            <h2>At Best Way Portuguese, we offer one-on-one classes that are 100% focused on you:</h2>
             <p>
                 We'll work together on your specific goals, whether you want to master a new subject, improve your conversation, or overcome your biggest language challenges. Here, the pace and content are entirely up to you.
             </p>
@@ -62,16 +62,37 @@
             <div class="form-row-contato">
                 <label>Do you accept institutional contact from BestWay Portuguese?</label>
                 <div class="radio-group">
-                    <input type="radio" id="contato-sim" name="aceita_contato" value="true">
-                    <label for="contato-sim">Yes</label>
-
-                    <input type="radio" id="contato-nao" name="aceita_contato" value="false" checked>
+                    <input type="radio" id="contato-nao" name="aceita_contato" value="false">
                     <label for="contato-nao">No</label>
+
+                    <input type="radio" id="contato-sim" name="aceita_contato" value="true" checked>
+                    <label for="contato-sim">Yes</label>
                 </div>
             </div>
             <button type="submit">Submit</button>
         </form>
         <button class="skip-auth-button">skip (TESTE)</button>
+    </div>
+
+    <div id="code-verification-container" class="auth-container" style="display: none; z-index: 2;">
+        <div class="auth-card">
+            <h2>Verify your E-mail</h2>
+            <p>We have sent a 6-digit code to your e-mail. Please, insert it bellow to continue.</p>
+            
+            <form id="code-verification-form">
+                {% csrf_token %}
+                <div class="form-row"> 
+                    <label for="code-input">6-Digit Verification Code</label>
+                    <input type="text" id="code-input" name="code" maxlength="6" inputmode="numeric" pattern="[0-9]{6}" required>
+                </div>
+
+                <div id="code-error-message" style="color: red; font-size: 0.9rem; margin-top: 5px;"></div>
+
+                <button type="submit" id="verify-code-button">Verify and Continue</button>
+                
+            </form>
+            
+        </div>
     </div>
 
     <div class="quiz-container" style="display: none;">
