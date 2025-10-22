@@ -58,26 +58,31 @@ export function renderQuestionUI(question, container) {
 
     // === Lógica de leitura de texto ===
     const speakButtons = container.querySelectorAll('.speak-button');
-    speakButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            // Pega o texto da questão
-            const questionText = container.querySelector('.text-to-speak')?.textContent || '';
+        speakButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Pega o texto da questão
+                const questionText = container.querySelector('.text-to-speak')?.textContent || '';
 
-            // Pega as opções (caso existam)
-            const options = Array.from(container.querySelectorAll('.answer-option'))
-                .map(btn => btn.textContent)
-                .join(', ');
+                // --- LINHA DE CORREÇÃO ADICIONADA ---
+                // Substitui um ou mais underscores por uma vírgula (pausa),
+                // garantindo comportamento consistente em todos os navegadores.
+                const cleanQuestionText = questionText.replace(/_+/g, ', ');
 
-            // Combina questão + respostas
-            const fullText = options ? `${questionText}. Opções: ${options}.` : questionText;
+                // Pega as opções (caso existam)
+                const options = Array.from(container.querySelectorAll('.answer-option'))
+                    .map(btn => btn.textContent)
+                    .join(', ');
 
-            // Cancela qualquer leitura anterior e fala o novo texto
-            speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(fullText);
-            utterance.lang = 'pt-BR'; 
-            speechSynthesis.speak(utterance);
+                // Combina questão + respostas (USANDO O TEXTO LIMPO)
+                const fullText = options ? `${cleanQuestionText}. Opções: ${options}.` : cleanQuestionText;
+
+                // Cancela qualquer leitura anterior e fala o novo texto
+                speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(fullText);
+                utterance.lang = 'pt-BR'; 
+                speechSynthesis.speak(utterance);
+            });
         });
-    });
 }
 
 /**
