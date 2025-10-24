@@ -46,6 +46,8 @@ def gerar_relatorio(request):
         nome_aluno = data.get("nome_aluno", "Aluno_Anonimo")
         respostas = data.get("respostas", [])
         nivel = data.get("nivel", "Não especificado")
+        acertos = data.get("acertos", 0)
+        total_questoes = data.get("total_questoes", 0)
         nota_final = data.get("nota_final", 0)
         quer_pdf = data.get("pdf", False)
         
@@ -119,6 +121,8 @@ def gerar_relatorio(request):
                 "nome_aluno": nome_aluno,
                 **resposta_final,
                 "nivel": nivel,
+                "acertos": acertos,
+                "total_questoes": total_questoes,
                 "nota_final": nota_final,
                 "data_emissao": datetime.date.today().strftime('%d de %B de %Y')
             }

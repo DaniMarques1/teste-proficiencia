@@ -27,9 +27,7 @@ const codeVerificationForm = document.getElementById('code-verification-form');
 const codeInput = document.getElementById('code-input');
 const codeErrorMessage = document.getElementById('code-error-message');
 
-// --- FUNÇÕES DE CONTROLE DO QUIZ ---
 async function loadQuestion() {
-    // ... (Esta função permanece igual)
     try {
         const data = await fetchQuestion(currentQuestionId);
         currentQuestionData = data;
@@ -161,52 +159,55 @@ async function checkAnswer() {
 }
 
 async function sendResultsToBackend() {
-    const csrftoken = getCookie('csrftoken');
+    const csrftoken = getCookie('csrftoken');
 
-    const respostas = resultados.map(r =>
-        `Question: ${r.question} | Your answer: ${r.userAnswer} | Correct answer: ${r.correctAnswer}`
-    );
+    const respostas = resultados.map(r =>
+        `Question: ${r.question} | Your answer: ${r.userAnswer} | Correct answer: ${r.correctAnswer}`
+    );
 
-    const acertos = resultados.filter(r => r.isCorrect).length;
-    const nota_final = Math.round((acertos / resultados.length) * 100); 
+    const acertos = resultados.filter(r => r.isCorrect).length;
+    const total_questoes = resultados.length;
+    const nota_final = Math.round((acertos / total_questoes) * 100); 
 
-    // 1. Capture os valores dos inputs de nome e e-mail
     const nome_aluno = document.getElementById('user-name')?.value || "Aluno";
-    const email_aluno = document.getElementById('user-email')?.value || null; // Use null se estiver vazio
+    const email_aluno = document.getElementById('user-email')?.value || null;
 
-    const payload = {
-        nome_aluno: nome_aluno,
+    const payload = {
+        nome_aluno,
         email_destinatario: email_aluno, 
-        respostas: respostas,
-        nivel: "A1 Intermediário", 
-        nota_final: nota_final,
-        pdf: true 
-    };
+        respostas,
+        nivel: "A1 Intermediário", 
+        nota_final,
+        acertos,
+        total_questoes,
+        pdf: true 
+    };
 
-    try {
-        const response = await fetch("/gerar-relatorio/", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": csrftoken
-            },
-            body: JSON.stringify(payload)
-        });
+    try {
+        const response = await fetch("/gerar-relatorio/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrftoken
+            },
+            body: JSON.stringify(payload)
+        });
 
-        const data = await response.json();
+        const data = await response.json();
 
-        if (response.ok) {
-            console.log("✅ Análise da IA recebida com sucesso:", data);
-            return data; 
-        } else {
-            alert("Erro ao gerar feedback: " + (data.erro || "Erro desconhecido"));
-            return null;
-        }
-    } catch (error) {
-        console.error("Erro ao enviar resultados:", error);
-        return null;
-    }
+        if (response.ok) {
+            console.log("✅ Análise da IA recebida com sucesso:", data);
+            return data; 
+        } else {
+            alert("Erro ao gerar feedback: " + (data.erro || "Erro desconhecido"));
+            return null;
+        }
+    } catch (error) {
+        console.error("Erro ao enviar resultados:", error);
+        return null;
+    }
 }
+
 
 
 function loadNextQuestion() {

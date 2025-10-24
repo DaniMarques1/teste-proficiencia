@@ -27,8 +27,12 @@ def get_teacher(request, teacher_id):
         return JsonResponse({'error': f'Teacher number {teacher_id} not found.'}, status=404)
 
 def get_teachers(request): 
-    professores = Professores.objects.all()
-    data = [model_to_dict(p) for p in professores]
+    # 1. order_by('?') ordena os resultados aleatoriamente no banco de dados.
+    # 2. [:2] pega apenas os 2 primeiros resultados dessa ordenação aleatória.
+    professores = Professores.objects.order_by('?')[:2]
+    
+    # Serializa os dados, excluindo 'telefone' e 'email'
+    data = [model_to_dict(p, exclude=['telefone', 'email']) for p in professores]
     
     return JsonResponse(data, safe=False)
 
@@ -177,13 +181,8 @@ def verificar_e_salvar(request):
         }, status=400)
 
     if user_code == session_code:
-        # SUCESSO! O código bateu.
-        # Vamos recriar o formulário com os dados da sessão
         form = UsuarioForm(reg_data)
 
-        # Rodamos form.is_valid() DE NOVO.
-        # Isso é uma checagem de segurança importante (race condition)
-        # para garantir que ninguém pegou o e-mail nesse meio tempo.
         if form.is_valid():
             novo_usuario = form.save(commit=False)
             novo_usuario.criado_em = timezone.now()
