@@ -208,8 +208,6 @@ async function sendResultsToBackend() {
     }
 }
 
-
-
 function loadNextQuestion() {
     applyFade(cardsContainer, 'out');
 
@@ -231,8 +229,6 @@ function handleEnterKey(event) {
 function iniciarQuiz() {
     console.log("Iniciando o Quiz (preparando tela de apresentação)...");
 }
-
-// --- INICIALIZAÇÃO E EVENTOS ---
 
 nextButton.addEventListener('click', checkAnswer);
 
@@ -364,24 +360,36 @@ if (codeVerificationForm) {
     });
 }
 
+document.addEventListener('DOMContentLoaded', () => {
 
-skipAuthButton.addEventListener('click', (event) => {
-    event.preventDefault();
-    const userDataContainer = document.getElementById('user-data-container');
-    applyFade(userDataContainer, 'out');
-    
-    setTimeout(() => {
-        userDataContainer.style.display = 'none';
-        const quizContainer = document.getElementById('presentation-container'); 
-        
-        if (quizContainer) {
-            quizContainer.style.display = 'block';
-            requestAnimationFrame(() => applyFade(quizContainer, 'in'));
-        } else {
-            console.error('Error: The quiz container was not found!');
-        }
-        iniciarQuiz(); 
-    }, 300); 
+    // 1. Tenta encontrar o botão
+    const skipAuthButton = document.getElementById('skipAuthButton');
+
+    // 2. Se o botão existir (ou seja, DEBUG=True)...
+    if (skipAuthButton) {
+        
+        // 3. Adiciona o evento de clique
+        skipAuthButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            const userDataContainer = document.getElementById('user-data-container');
+            applyFade(userDataContainer, 'out');
+            
+            setTimeout(() => {
+                userDataContainer.style.display = 'none';
+                const quizContainer = document.getElementById('presentation-container'); 
+                
+                if (quizContainer) {
+                    quizContainer.style.display = 'block';
+                    requestAnimationFrame(() => applyFade(quizContainer, 'in'));
+                } else {
+                    console.error('Error: The quiz container was not found!');
+                }
+                iniciarQuiz(); 
+            }, 300); 
+        });
+    }
+    // Se o botão não existir (DEBUG=False), nada acontece,
+    // e nenhum erro é gerado.
 });
 
 function getCookie(name) {

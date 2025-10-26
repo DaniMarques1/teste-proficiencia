@@ -71,7 +71,9 @@
             </div>
             <button type="submit">Submit</button>
         </form>
-        <button class="skip-auth-button">skip (TESTE)</button>
+        {% if DEBUG %}
+                <button id="skipAuthButton" class="skip-auth-button">skip (TESTE)</button>
+        {% endif %}
     </div>
 
     <div id="code-verification-container" class="auth-container" style="display: none; z-index: 2;">

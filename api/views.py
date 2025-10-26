@@ -106,7 +106,10 @@ def check_answer(request):
         return JsonResponse({'error': str(e)}, status=500)
 
 def index_view(request):
-    return render(request, 'index.html')
+    context = {
+        'DEBUG': settings.DEBUG,
+    }
+    return render(request, 'index.html', context)
 
 @require_http_methods(["POST"])
 @ensure_csrf_cookie
