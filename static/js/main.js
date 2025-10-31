@@ -56,56 +56,48 @@ async function loadQuestion() {
 }
 
 async function handleQuizEnd() {
-    applyFade(quizContainer, 'out');
-    nextButton.style.display = 'none';
+    applyFade(quizContainer, 'out');
+    nextButton.style.display = 'none';
 
-    // 1️⃣ Mostra o loader assim que o quiz desaparecer
-    setTimeout(() => {
-        quizContainer.style.display = 'none';
-        feedbackContainer.style.display = 'block';
+    // 1️⃣ Mostra o loader
+    setTimeout(() => {
+        quizContainer.style.display = 'none';
+        feedbackContainer.style.display = 'block';
 
-        // Define o HTML do loader
-        feedbackContainer.innerHTML = `
-            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; text-align: center;">
-                <div class="spinner"></div> 
-                <p style="font-size: 1.2rem; margin-top: 20px;">Loading results...</p>
-            </div>
-        `;
-        
-        requestAnimationFrame(() => applyFade(feedbackContainer, 'in'));
-    }, 300); // 300ms = tempo do seu fade-out
+        feedbackContainer.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; text-align: center;">
+                <div class="spinner"></div> 
+                <p style="font-size: 1.2rem; margin-top: 20px;">Loading results...</p>
+            </div>
+        `;
+        
+        requestAnimationFrame(() => applyFade(feedbackContainer, 'in'));
+    }, 300); // 300ms = tempo do seu fade-out
 
-    try {
-        const reportData = await sendResultsToBackend(); // <- Chamada principal
-        const teachers = await fetchTeachers();
+    try {
+        const reportData = await sendResultsToBackend();
+        const teachers = await fetchTeachers();
 
-        displayFeedbackScreen(
-            resultados,
-            teachers,
-            questionTitleElement,
-            feedbackContainer,
-            reportData?.pontos_fortes || [],
-            reportData?.pontos_a_desenvolver || []
-        );
+        // Exibe a tela de feedback pela primeira vez
+        displayFeedbackScreen(
+            resultados,
+            teachers,
+            questionTitleElement,
+            feedbackContainer,
+            reportData?.pontos_fortes || [],
+            reportData?.pontos_a_desenvolver || []
+        );
 
-        // 4️⃣ Re-adiciona os event listeners aos novos botões
-        const emailButton = document.getElementById('get-results-button');
-        const showDetailsButton = document.getElementById('show-details-button');
+        // --- INÍCIO DA CORREÇÃO ---
 
-        if (emailButton) {
-            emailButton.addEventListener('click', () => {
-                alert('Funcionalidade de envio de email a ser implementada!');
-            });
-        }
-
-        if (showDetailsButton) {
-        showDetailsButton.addEventListener('click', () => {
+        // 2. Handler para o clique no "See Responses"
+        function handleShowDetailsClick() {
             applyFade(feedbackContainer, 'out');
             setTimeout(() => {
-                // Renderiza a tela final
+                // Renderiza a tela final com os detalhes
                 displayQuizFinished(resultados, questionTitleElement, feedbackContainer);
 
-                // 🔙 Adiciona o botão "Voltar" à tela final
+                // 🔙 Adiciona o botão "Voltar"
                 const backButton = document.createElement('button');
                 backButton.textContent = "Back to Results";
                 backButton.className = "back-to-feedback-button";
@@ -121,14 +113,13 @@ async function handleQuizEnd() {
                 backButton.onmouseenter = () => backButton.style.backgroundColor = "#357ABD";
                 backButton.onmouseleave = () => backButton.style.backgroundColor = "#4a90e2";
 
-                // Insere o botão no final do container
                 feedbackContainer.appendChild(backButton);
 
-                // 🔄 Adiciona evento para voltar à tela anterior
+                // 🔄 Adiciona evento para VOLTAR à tela anterior
                 backButton.addEventListener('click', () => {
                     applyFade(feedbackContainer, 'out');
                     setTimeout(() => {
-                        // Reexibe a tela de feedback com as recomendações
+                        // Reexibe a tela de feedback (recriando os botões)
                         displayFeedbackScreen(
                             resultados,
                             teachers,
@@ -137,22 +128,49 @@ async function handleQuizEnd() {
                             reportData?.pontos_fortes || [],
                             reportData?.pontos_a_desenvolver || []
                         );
+                        
+                        // ✨ PONTO-CHAVE: Re-anexa os listeners aos botões recriados
+                        attachFeedbackListeners();
+
                         requestAnimationFrame(() => applyFade(feedbackContainer, 'in'));
                     }, 300);
                 });
 
-            requestAnimationFrame(() => applyFade(feedbackContainer, 'in'));
-        }, 300);
-    });
-}
+                requestAnimationFrame(() => applyFade(feedbackContainer, 'in'));
+            }, 300);
+        }
 
+        // 3. Handler para o clique no botão de Email
+        function handleEmailClick() {
+            alert('Funcionalidade de envio de email a ser implementada!');
+        }
 
-    } catch (error) {
-        // 5️⃣ Em caso de erro, substitui o loader pela mensagem de erro
-        console.error("Erro ao finalizar quiz:", error);
-        questionTitleElement.textContent = 'Erro ao carregar resultados';
-        feedbackContainer.innerHTML = `<p>Não foi possível carregar as recomendações. Tente novamente mais tarde.</p>`;
-    }
+        // 4. Função "Anexadora"
+        // Esta função encontra os botões na tela e anexa os handlers corretos
+        function attachFeedbackListeners() {
+            const emailButton = document.getElementById('get-results-button');
+            const showDetailsButton = document.getElementById('show-details-button');
+
+            if (emailButton) {
+                emailButton.addEventListener('click', handleEmailClick);
+            }
+
+            if (showDetailsButton) {
+                showDetailsButton.addEventListener('click', handleShowDetailsClick);
+            }
+        }
+
+        // 5. Chama a função anexadora pela primeira vez
+        attachFeedbackListeners();
+        
+        // --- FIM DA CORREÇÃO ---
+
+    } catch (error) {
+        // 5️⃣ Em caso de erro, substitui o loader pela mensagem de erro
+        console.error("Erro ao finalizar quiz:", error);
+        questionTitleElement.textContent = 'Erro ao carregar resultados';
+        feedbackContainer.innerHTML = `<p>Não foi possível carregar as recomendações. Tente novamente mais tarde.</p>`;
+    }
 }
 
 async function checkAnswer() {
