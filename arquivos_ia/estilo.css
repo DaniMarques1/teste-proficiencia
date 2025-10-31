@@ -88,9 +88,9 @@ body {
 
 .main-score {
     flex-shrink: 0;
-    width: 160px; /* Reduzindo um pouco */
-    height: 160px; /* Reduzindo um pouco */
-    border: 7px solid var(--cor-verde); /* Ajustando borda */
+    width: 180px; /* Reduzindo um pouco */
+    height: 180px; /* Reduzindo um pouco */
+    border: 6px solid var(--cor-verde); /* Ajustando borda */
     border-radius: 50%;
     display: flex;
     flex-direction: column;

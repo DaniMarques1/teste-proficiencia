@@ -10,6 +10,8 @@ from jinja2 import Environment, FileSystemLoader
 from weasyprint import HTML
 from dotenv import load_dotenv
 import openai
+from questoes.models import NiveisDificuldade
+from .calculo_nivel import calcular_nivel_proficiencia
 
 load_dotenv()
 
@@ -39,17 +41,39 @@ def gerar_relatorio(request):
         return JsonResponse({"erro": "Método não permitido. Use POST."}, status=405)
 
     try:
-        # 1. Ler o corpo da requisição
         data = json.loads(request.body)
 
-        # 2. Extrair os dados do payload
         nome_aluno = data.get("nome_aluno", "Aluno_Anonimo")
         respostas = data.get("respostas", [])
-        nivel = data.get("nivel", "Não especificado")
+        respostas_binarias = data.get("respostas_binarias", [])
+        niveis_dificuldade_ids = data.get("niveis_dificuldade_ids", [])
         acertos = data.get("acertos", 0)
         total_questoes = data.get("total_questoes", 0)
         nota_final = data.get("nota_final", 0)
         quer_pdf = data.get("pdf", False)
+        email_destinatario = data.get("email_destinatario")
+
+        if not respostas_binarias or not niveis_dificuldade_ids:
+            return JsonResponse({"erro": "Listas de respostas ou níveis de dificuldade ausentes."}, status=400)
+
+        # --- Converte IDs em pesos (float) ---
+        dificuldades_itens = []
+        for id_ in niveis_dificuldade_ids:
+            try:
+                nivel_obj = NiveisDificuldade.objects.get(pk=id_)
+                dificuldades_itens.append(float(nivel_obj.peso))
+            except NiveisDificuldade.DoesNotExist:
+                dificuldades_itens.append(0.0)  # default caso não exista
+
+        # --- Calcula o nível de proficiência ---
+        try:
+            nivel_proficiencia = calcular_nivel_proficiencia(respostas_binarias, dificuldades_itens)
+        except Exception as e:
+            print(f"Erro ao calcular proficiência: {e}")
+            nivel_proficiencia = "Erro ao calcular"
+
+        # Atribui o resultado ao campo 'nivel'
+        nivel = nivel_proficiencia
         
         # Obter o e-mail (pode ser None)
         email_destinatario = data.get("email_destinatario", None)
@@ -120,7 +144,7 @@ def gerar_relatorio(request):
             dados_template = {
                 "nome_aluno": nome_aluno,
                 **resposta_final,
-                "nivel": nivel,
+                "nivel": nivel_proficiencia,
                 "acertos": acertos,
                 "total_questoes": total_questoes,
                 "nota_final": nota_final,

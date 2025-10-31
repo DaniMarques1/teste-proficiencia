@@ -4,6 +4,7 @@ class NiveisDificuldade(models.Model):
     id = models.IntegerField(primary_key=True)
     nivel = models.CharField(unique=True, max_length=50)
     peso = models.DecimalField(max_digits=5, decimal_places=2)
+    maximo_questoes = models.IntegerField(default=0)
 
     class Meta:
         managed = False

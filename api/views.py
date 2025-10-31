@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponseForbidden
 from django.forms.models import model_to_dict  
-from questoes.models import Professores, Questoes, Respostas
+from questoes.models import Professores, Questoes, Respostas, NiveisDificuldade
 from contas.models import Usuarios
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.http import require_http_methods
@@ -37,32 +37,48 @@ def get_teachers(request):
     return JsonResponse(data, safe=False)
 
 def get_question(request, question_id):
-    # Agora filtramos por todas as questões que estão ativas.
-    questoes_queryset = Questoes.objects.filter(ativo=True).prefetch_related('respostas_set').order_by('id')
+    # Obtemos todos os níveis de dificuldade com suas respectivas quantidades máximas
+    niveis = NiveisDificuldade.objects.all()
+    
+    # Montamos uma lista de IDs de questões, respeitando o 'maximo_questoes' de cada nível
+    questoes_filtradas = []
+    for nivel in niveis:
+        questoes_nivel = (
+            Questoes.objects.filter(ativo=True, nivel_dificuldade=nivel.id)
+            .order_by('id')[:nivel.maximo_questoes]
+        )
+        questoes_filtradas.extend(list(questoes_nivel))
+    
+    # Agora temos apenas as questões ativas limitadas conforme cada nível
+    questoes_queryset = questoes_filtradas
     
     question_index = question_id - 1
-    
+
     try:
         questao_obj = questoes_queryset[question_index]
-        
-        # ALTERAÇÃO: Usamos 'exclude' para omitir o campo 'explicacao'
+
+        # Excluímos o campo 'explicacao' do retorno
         question_data = model_to_dict(questao_obj, exclude=['explicacao'])
 
         respostas_queryset = questao_obj.respostas_set.all()
-        respostas_data = []
-        for r in respostas_queryset:
-            respostas_data.append({
+        respostas_data = [
+            {
                 'id': r.id,
                 'resposta': r.resposta,
                 'questao': r.questao.id
-            })
+            }
+            for r in respostas_queryset
+        ]
 
         question_data['respostas'] = respostas_data
 
         return JsonResponse(question_data)
 
     except IndexError:
-        return JsonResponse({'error': f'Question number {question_id} not found among active questions.'}, status=404)
+        return JsonResponse(
+            {'error': f'Question number {question_id} not found among active questions.'},
+            status=404
+        )
     
 @require_http_methods(["POST"])
 @csrf_exempt
@@ -75,18 +91,29 @@ def check_answer(request):
         if not question_index_id or not answer_id:
             return HttpResponseBadRequest("Faltando question_id ou answer_id")
 
-        questoes_queryset = Questoes.objects.filter(ativo=True).order_by('id')
+        # --- NOVO BLOCO: aplicar limitação por nível de dificuldade ---
+        niveis = NiveisDificuldade.objects.all()
+        questoes_filtradas = []
+        for nivel in niveis:
+            questoes_nivel = (
+                Questoes.objects.filter(ativo=True, nivel_dificuldade=nivel.id)
+                .order_by('id')[:nivel.maximo_questoes]
+            )
+            questoes_filtradas.extend(list(questoes_nivel))
+        # --------------------------------------------------------------
+
         question_index = int(question_index_id) - 1
 
-        if question_index < 0:
-            return JsonResponse({'error': f'O número da questão ({question_index_id}) é inválido.'}, status=404)
+        if question_index < 0 or question_index >= len(questoes_filtradas):
+            return JsonResponse(
+                {'error': f'O número da questão ({question_index_id}) é inválido.'},
+                status=404
+            )
         
-        questao_obj = questoes_queryset[question_index]
-        
+        questao_obj = questoes_filtradas[question_index]
         real_question_id = questao_obj.id
 
         selected_answer = Respostas.objects.get(id=answer_id, questao_id=real_question_id)
-
         correct_answer = Respostas.objects.get(questao_id=real_question_id, correta=True)
 
         is_correct = (selected_answer.id == correct_answer.id)

@@ -99,14 +99,53 @@ async function handleQuizEnd() {
         }
 
         if (showDetailsButton) {
-            showDetailsButton.addEventListener('click', () => {
-                applyFade(feedbackContainer, 'out');
-                setTimeout(() => {
-                    displayQuizFinished(resultados, questionTitleElement, feedbackContainer);
-                    requestAnimationFrame(() => applyFade(feedbackContainer, 'in'));
-                }, 300);
-            });
-        }
+        showDetailsButton.addEventListener('click', () => {
+            applyFade(feedbackContainer, 'out');
+            setTimeout(() => {
+                // Renderiza a tela final
+                displayQuizFinished(resultados, questionTitleElement, feedbackContainer);
+
+                // 🔙 Adiciona o botão "Voltar" à tela final
+                const backButton = document.createElement('button');
+                backButton.textContent = "Back to Results";
+                backButton.className = "back-to-feedback-button";
+                backButton.style.marginTop = "20px";
+                backButton.style.padding = "10px 20px";
+                backButton.style.borderRadius = "8px";
+                backButton.style.border = "none";
+                backButton.style.backgroundColor = "#4a90e2";
+                backButton.style.color = "#fff";
+                backButton.style.fontSize = "1rem";
+                backButton.style.cursor = "pointer";
+                backButton.style.transition = "background 0.2s";
+                backButton.onmouseenter = () => backButton.style.backgroundColor = "#357ABD";
+                backButton.onmouseleave = () => backButton.style.backgroundColor = "#4a90e2";
+
+                // Insere o botão no final do container
+                feedbackContainer.appendChild(backButton);
+
+                // 🔄 Adiciona evento para voltar à tela anterior
+                backButton.addEventListener('click', () => {
+                    applyFade(feedbackContainer, 'out');
+                    setTimeout(() => {
+                        // Reexibe a tela de feedback com as recomendações
+                        displayFeedbackScreen(
+                            resultados,
+                            teachers,
+                            questionTitleElement,
+                            feedbackContainer,
+                            reportData?.pontos_fortes || [],
+                            reportData?.pontos_a_desenvolver || []
+                        );
+                        requestAnimationFrame(() => applyFade(feedbackContainer, 'in'));
+                    }, 300);
+                });
+
+            requestAnimationFrame(() => applyFade(feedbackContainer, 'in'));
+        }, 300);
+    });
+}
+
 
     } catch (error) {
         // 5️⃣ Em caso de erro, substitui o loader pela mensagem de erro
@@ -143,12 +182,13 @@ async function checkAnswer() {
         const result = await checkAnswerAPI(currentQuestionId, userAnswerId, csrftoken);
 
         resultados.push({
-            question: currentQuestionData.texto,
-            userAnswer: userAnswerText,
-            correctAnswer: result.correct_answer_text, 
-            isCorrect: result.is_correct,
-            explicacao: result.explicacao
-        });
+        question: currentQuestionData.texto,
+        userAnswer: userAnswerText,
+        correctAnswer: result.correct_answer_text,
+        isCorrect: result.is_correct,
+        explicacao: result.explicacao,
+        nivel_dificuldade: currentQuestionData.nivel_dificuldade  // <-- aqui
+    });
 
         loadNextQuestion();
 
@@ -160,6 +200,10 @@ async function checkAnswer() {
 
 async function sendResultsToBackend() {
     const csrftoken = getCookie('csrftoken');
+
+    // Listas para cálculo de proficiência
+    const respostas_binarias = resultados.map(r => r.isCorrect ? 1 : 0);
+    const niveis_dificuldade_ids = resultados.map(r => r.nivel_dificuldade);
 
     const respostas = resultados.map(r =>
         `Question: ${r.question} | Your answer: ${r.userAnswer} | Correct answer: ${r.correctAnswer}`
@@ -176,12 +220,15 @@ async function sendResultsToBackend() {
         nome_aluno,
         email_destinatario: email_aluno, 
         respostas,
-        nivel: "A1 Intermediário", 
+        respostas_binarias,
+        niveis_dificuldade_ids,
         nota_final,
         acertos,
         total_questoes,
         pdf: true 
     };
+
+    console.log("📦 Payload enviado ao backend:", payload);
 
     try {
         const response = await fetch("/gerar-relatorio/", {
@@ -196,7 +243,7 @@ async function sendResultsToBackend() {
         const data = await response.json();
 
         if (response.ok) {
-            console.log("✅ Análise da IA recebida com sucesso:", data);
+            console.log("✅ Resultado e nível de proficiência calculado:", data);
             return data; 
         } else {
             alert("Erro ao gerar feedback: " + (data.erro || "Erro desconhecido"));

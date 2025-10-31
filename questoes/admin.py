@@ -7,7 +7,7 @@ class RespostasInline(admin.TabularInline):
 
 @admin.register(NiveisDificuldade)
 class NiveisDificuldadeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'nivel', 'peso') 
+    list_display = ('id', 'nivel', 'peso', 'maximo_questoes') 
 
 @admin.register(Professores)
 class ProfessoresAdmin(admin.ModelAdmin):
