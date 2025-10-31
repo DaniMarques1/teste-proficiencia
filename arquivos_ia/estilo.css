@@ -88,8 +88,8 @@ body {
 
 .main-score {
     flex-shrink: 0;
-    width: 180px; /* Reduzindo um pouco */
-    height: 180px; /* Reduzindo um pouco */
+    width: 200px; /* Reduzindo um pouco */
+    height: 200px; /* Reduzindo um pouco */
     border: 6px solid var(--cor-verde); /* Ajustando borda */
     border-radius: 50%;
     display: flex;

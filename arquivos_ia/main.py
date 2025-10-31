@@ -15,7 +15,7 @@ OPENAI_KEY = os.getenv('OPENAI_KEY')
 openai.api_key = OPENAI_KEY
 
 nota_final = 30
-nivel = "Avançado Superior"
+nivel = "Intermediário Superior"
 
 history_modelo = [{
     "role": "system",
