@@ -1,6 +1,5 @@
 import { fetchQuestion, fetchTeachers, checkAnswerAPI } from './api.js';
 import { renderQuestionUI, displayFeedbackScreen, displayQuizFinished, applyFade } from './ui.js';
-import { initializeAudioFeatures } from './audio.js';
 
 // --- ESTADO GLOBAL DO QUIZ ---
 let questionNumber = 1;

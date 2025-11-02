@@ -3,6 +3,15 @@
 ## Objetivo
 Desenvolver uma aplicação web com integração de inteligência artificial para identificar o nível de proficiência em português de falantes estrangeiros, especialmente nativos da língua inglesa.
 
+## Resumo do sistema:
+- 📜Quiz com perguntas em 3 dificuldades, para avaliar proficiência em Português.
+- 🥇Telas de feedback e resultados das perguntas, mostrando acertos e erros, além de explicação para a resposta correta.
+- ✉️Integração de e-mail para entrar no quiz e para receber o resultado.
+- 🤖Integração com a IA para gerar feedback personalizado (condizente com as respostas do usuário).
+- 🧠Cálculo de nível de proficiência.
+- 📝Acesso ao banco de dados por meio de um dashboard integrado, sendo possível edição, adição e exclusão das perguntas e respostas, possibilidade de definir a quantidade de questões por dificuldade, além de acesso à outras tabelas do sistema.
+- 🧑‍🏫Indicação para professores da plataforma.
+
 ----------------------------------------------------------
 
 ### Como instalar:
@@ -44,6 +53,7 @@ DEBUG=True
 ALLOWED_HOSTS=127.0.0.1,localhost
 EMAIL_HOST_USER=seuEnderecoDeEmail
 EMAIL_HOST_PASSWORD=suaSenhaDoEmail
+OPENAI_KEY=suaChaveOpenAI
 ```
 
 7 - Crie o database MySQL utilizando o arquivo "pi_proficiencia.sql".
