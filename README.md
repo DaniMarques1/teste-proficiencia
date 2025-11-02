@@ -58,7 +58,16 @@ OPENAI_KEY=suaChaveOpenAI
 
 7 - Crie o database MySQL utilizando o arquivo "pi_proficiencia.sql".
 
-8 - Inicie o servidor Django:
+8 - Crie as tabelas de administração do database:
+```bash
+py manage.py migrate
+```
+9 - Crie o superusuário para acessar o dashboard:
+```bash
+python manage.py createsuperuser
+```
+
+10 - Inicie o servidor Django:
 ```bash
 py manage.py runserver
 ```
