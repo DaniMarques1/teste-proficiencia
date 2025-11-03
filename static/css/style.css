@@ -150,6 +150,7 @@ body {
 .card-content .text {
     font-size: 1.5em; 
     font-weight: bold;
+    text-align: justify;
 }
 
 .card-content input[type="text"] {
@@ -225,7 +226,7 @@ body {
   align-items: center; 
   gap: 10px; 
   margin-top: 20px; 
-  width: 100%;
+  width: 100%;  
 }
 /* Estilo para o card de resposta */
 .answer-card {
@@ -741,7 +742,13 @@ body {
     }
     .navbar-logo img {
             width: 100px;
-        }
+    }
+    .card-content .text {
+    font-size: 1em; 
+    }
+    .answer-option {
+    font-size: 0.8em;
+}
 }
 
 @media (max-width: 900px) {
